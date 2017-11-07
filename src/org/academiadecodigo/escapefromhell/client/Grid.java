@@ -13,9 +13,6 @@ import com.googlecode.lanterna.terminal.Terminal;
 public class Grid {
 
     private Screen screen;
-
-    private Position position;
-
     private Boolean[][] grid;
 
     private int cols;
@@ -41,11 +38,8 @@ public class Grid {
 
         this.screen = TerminalFacade.createScreen();
         screen.startScreen();
-
-        System.out.println(this.screen.getTerminalSize().getColumns());
-        System.out.println(this.screen.getTerminalSize().getRows());
         screen.setCursorPosition(this.screen.getTerminalSize().getColumns() / 2 - 1, this.screen.getTerminalSize().getRows() - 1);
-        //screen.refresh();
+
         refresh();
 
         while (true) {
@@ -69,10 +63,27 @@ public class Grid {
                     drawRight();
                 }
 
+                if(key.getCharacter() == 'p'){
+                    showGrid();
+                }
+
             }
 
         }
 
+    }
+
+    private void showGrid() {
+        for (int row = 0; row < 30; row++) {
+            for (int col = 0; col < 100; col++) {
+                if(grid[row][col]){
+                    System.out.print("1");
+                }else {
+                    System.out.print("0");
+                }
+            }
+            System.out.println("");
+        }
     }
 
     private void drawRight() {
@@ -88,8 +99,11 @@ public class Grid {
     private void moveRight() {
         //TODO check fall
         if(grid[this.screen.getCursorPosition().getRow()][this.screen.getCursorPosition().getColumn() + 1]){
+
             this.screen.setCursorPosition(this.screen.getCursorPosition().getColumn() + 1, this.screen.getCursorPosition().getRow() - 1);
+
         }else {
+
             this.screen.setCursorPosition(this.screen.getCursorPosition().getColumn() + 1, this.screen.getCursorPosition().getRow());
         }
 
@@ -99,8 +113,10 @@ public class Grid {
     private void moveLeft() {
         //TODO check fall
         if(grid[this.screen.getCursorPosition().getRow()][this.screen.getCursorPosition().getColumn() - 1]){
+
             this.screen.setCursorPosition(this.screen.getCursorPosition().getColumn() - 1, this.screen.getCursorPosition().getRow() - 1);
         }else {
+
             this.screen.setCursorPosition(this.screen.getCursorPosition().getColumn() - 1, this.screen.getCursorPosition().getRow());
         }
         refresh();
@@ -120,4 +136,5 @@ public class Grid {
 
         screen.refresh();
     }
+
 }
