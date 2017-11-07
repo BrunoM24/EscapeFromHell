@@ -1,16 +1,16 @@
 package org.academiadecodigo.escapefromhell.client;
 
 import com.googlecode.lanterna.TerminalFacade;
+import com.googlecode.lanterna.input.Key;
 import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.screen.ScreenWriter;
-import com.googlecode.lanterna.terminal.Terminal;
 
 /**
  * EscapeFromHell Created by BrunoM24 on 07/11/2017.
  */
 
-
 public class Grid {
+
+    private Screen screen;
 
     private int cols;
     private int rows;
@@ -20,15 +20,61 @@ public class Grid {
         this.rows = rows;
     }
 
-    public void init(){
-        Screen screen = TerminalFacade.createScreen();
-        screen.getTerminal().getTerminalSize().setColumns(this.cols);
-        screen.getTerminal().getTerminalSize().setRows(this.rows);
+    public void init() {
 
-        ScreenWriter screenWriter = new ScreenWriter(screen);
-        screenWriter.setBackgroundColor(Terminal.Color.WHITE);
-        screenWriter.setForegroundColor(Terminal.Color.BLUE);
-
+        this.screen = TerminalFacade.createScreen();
         screen.startScreen();
+
+        screen.setCursorPosition(this.screen.getTerminalSize().getColumns() / 2 -1, this.screen.getTerminalSize().getRows()-1);
+        screen.refresh();
+
+        while (true) {
+            Key key = screen.readInput();
+
+            if (key != null) {
+
+                if(key.getKind() == Key.Kind.ArrowLeft){
+                    moveLeft();
+                }
+
+                if(key.getKind() == Key.Kind.ArrowRight){
+                    moveRight();
+                }
+
+                if(key.getCharacter() == 'a'){
+                    drawLeft();
+                }
+
+                if(key.getCharacter() == 's'){
+                    drawRight();
+                }
+
+            }
+
+        }
+
+
+    }
+
+    private void drawRight() {
+        System.out.println("s");
+    }
+
+    private void drawLeft() {
+        System.out.println("a");
+    }
+
+    private void moveRight() {
+       this.screen.setCursorPosition(this.screen.getCursorPosition().getColumn() + 1, this.screen.getCursorPosition().getRow());
+       refresh();
+    }
+
+    private void moveLeft() {
+        this.screen.setCursorPosition(this.screen.getCursorPosition().getColumn() - 1, this.screen.getCursorPosition().getRow());
+        refresh();
+    }
+
+    private void refresh(){
+        screen.refresh();
     }
 }

@@ -10,7 +10,7 @@ public class Game {
     private Grid grid;
 
     Game(){
-        this.grid = new Grid(100, 50);
+        this.grid = new Grid(60, 60);
     }
 
     public void start() {
