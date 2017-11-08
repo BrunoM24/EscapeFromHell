@@ -47,11 +47,17 @@ public class Game {
 
     public void init() {
 
-        view.setPlayerPos(view.terminalSize_X() / 2 - 1, view.terminalSize_Y() - 1);
-
         refresh();
 
         loadLevel();
+
+        spawnPlayer(23);
+
+    }
+
+    private void spawnPlayer (int row) {
+
+        view.setPlayerPos((int)(Math.random()*view.terminalSize_X()), row);
 
     }
 
@@ -88,6 +94,14 @@ public class Game {
 
         if(grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1]){
 
+            if(grid.getGrid()[view.playerPos_Y()-1][view.playerPos_X() + 1]){
+                return;
+            }
+            //block on top - cannot cross stair
+            if(grid.getGrid()[view.playerPos_Y()-1][view.playerPos_X()] && grid.getGrid()[view.playerPos_Y()][view.playerPos_X()+1]) {
+                return;
+            }
+
             view.setPlayerPos(view.playerPos_X() + 1, view.playerPos_Y() - 1);
 
         }else {
@@ -95,6 +109,8 @@ public class Game {
             view.setPlayerPos(view.playerPos_X() + 1, view.playerPos_Y());
 
         }
+
+        checkFall();
 
         refresh();
     }
@@ -108,6 +124,15 @@ public class Game {
 
         if(grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1]){
 
+            if(grid.getGrid()[view.playerPos_Y()-1][view.playerPos_X() - 1]){
+                return;
+            }
+
+            //block on top - cannot cross stair
+            if(grid.getGrid()[view.playerPos_Y()-1][view.playerPos_X()] && grid.getGrid()[view.playerPos_Y()][view.playerPos_X()-1]) {
+                return;
+            }
+
             view.setPlayerPos(view.playerPos_X() - 1, view.playerPos_Y() - 1);
 
         }else {
@@ -115,10 +140,29 @@ public class Game {
             view.setPlayerPos(view.playerPos_X() - 1, view.playerPos_Y());
         }
 
+        checkFall();
+
         refresh();
     }
 
+    private void checkFall() {
 
+        if (this.view.playerPos_Y() == view.terminalSize_Y()-1) {
+            return;
+        }
+        if (!grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()]) {
+
+            while (!grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()]) {
+
+                this.view.setPlayerPos(this.view.playerPos_X(), this.view.playerPos_Y()+1);
+                if (this.view.playerPos_Y() == view.terminalSize_Y()-1) {
+                    break;
+                }
+            }
+
+        }
+
+    }
     /*
     *
     * */
@@ -129,9 +173,9 @@ public class Game {
             for (int col = 0; col < 100; col++) {
 
                 if (grid.getGrid()[row][col]) {
-                    this.screen.putString(col, row, " ", Terminal.Color.BLACK, Terminal.Color.CYAN);
+                    this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.WHITE);
                 } else {
-                    this.screen.putString(col, row, " ", Terminal.Color.BLACK, Terminal.Color.WHITE);
+                    this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.BLACK);
                 }
 
             }
@@ -140,6 +184,11 @@ public class Game {
         screen.refresh();
     }
 
+
+    public void harakiri (int row) {
+
+        spawnPlayer(row);
+    }
 
     /*
     *

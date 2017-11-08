@@ -44,6 +44,10 @@ public class Player {
                     game.drawRight();
                 }
 
+                if (key.getCharacter() == 'h') {
+                    game.harakiri(0);
+                }
+
             }
 
         }
