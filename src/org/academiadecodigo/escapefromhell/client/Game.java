@@ -88,16 +88,20 @@ public class Game {
 
     /*
     *
+    * verify if next cell is filled
+    * if not occupy that is  a stair climb, if its a wall do nothing
+    * 2 cell above and cell to the right are fill do nothing
     * */
 
     public void moveRight() {
+
 
         if(grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1]){
 
             if(grid.getGrid()[view.playerPos_Y()-1][view.playerPos_X() + 1]){
                 return;
             }
-            //block on top - cannot cross stair
+            //2
             if(grid.getGrid()[view.playerPos_Y()-1][view.playerPos_X()] && grid.getGrid()[view.playerPos_Y()][view.playerPos_X()+1]) {
                 return;
             }
@@ -118,6 +122,9 @@ public class Game {
 
     /*
     *
+    * verify if next cell is filled
+    * if not occupy that is  a stair climb, if its a wall do nothing
+    * 2 cell above and cell to the left are fill do nothing
     * */
 
     public void moveLeft() {
@@ -145,6 +152,11 @@ public class Game {
         refresh();
     }
 
+
+    /*
+    * cheack if the player position is on the botton row
+    * while cell below player is empty incrise pY position of the player
+    * */
     private void checkFall() {
 
         if (this.view.playerPos_Y() == view.terminalSize_Y()-1) {
@@ -155,6 +167,7 @@ public class Game {
             while (!grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()]) {
 
                 this.view.setPlayerPos(this.view.playerPos_X(), this.view.playerPos_Y()+1);
+
                 if (this.view.playerPos_Y() == view.terminalSize_Y()-1) {
                     break;
                 }

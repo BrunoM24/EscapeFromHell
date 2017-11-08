@@ -42,4 +42,7 @@ public class Grid {
         return grid;
     }
 
+    public void update(Boolean[][] grid){
+        this.grid = grid;
+    }
 }
