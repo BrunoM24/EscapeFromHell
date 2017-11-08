@@ -1,4 +1,4 @@
-package org.academiadecodigo.escapefromhell.client;
+package org.academiadecodigo.escapefromhell.server;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -18,14 +18,14 @@ public class Server {
     * */
 
     private ExecutorService cachedPool = Executors.newCachedThreadPool();
-    //private CopyOnWriteArrayList<PlayerHandler> playerConected;
+    private CopyOnWriteArrayList<PlayerHandler> playerConected;
     private int port;
 
 
     public Server(int port){
 
         this.port = port;
-        //playerConected = new CopyOnWriteArrayList<>();
+        playerConected = new CopyOnWriteArrayList<>();
     }
 
 
@@ -46,31 +46,29 @@ public class Server {
 
                 Socket connection = server.accept();
 
-                //PlayerHandler playerSandler = new PlayerHandler(connection, this);
+                PlayerHandler playerHandler = new PlayerHandler(connection, this);
 
-                //playerConected.add(playerSandler);
+                playerConected.add(playerHandler);
 
-                //cachedPool.submit(playerSandler);
+                cachedPool.submit(playerHandler);
             }
         }catch (IOException e){
             e.printStackTrace();
         }
     }
 
-
     /*
     * Broadcast message for all clients
     * connected with the player
     * */
-/*
-    public void sendMessage(String message) {
+
+    public void sendMessage() {
 
         synchronized (playerConected) {
             try {
                 for (int i = 0; i < playerConected.size(); i++) {
                     PrintStream out = new PrintStream(playerConected.get(i).getConnection().getOutputStream());
 
-                    out.println(message);
 
                 }
             } catch (IOException e) {
@@ -78,20 +76,23 @@ public class Server {
             }
         }
     }
+    public boolean checkNumberOfPlayers(){
 
-+/
+        if(playerConected.size() < 2) {
+            return false;
+        }
+        return true;
+    }
+
     /*
     * Remove Player fom the List
     * when player close connection
     * with the server
     * */
-/*
+
     public void playerRemove(PlayerHandler playerHandler){
 
         playerConected.remove(playerHandler);
     }
-*/
+
 }
-/*
-* syncronize
-* */

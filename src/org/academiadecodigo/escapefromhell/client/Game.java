@@ -2,6 +2,11 @@ package org.academiadecodigo.escapefromhell.client;
 
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
+import org.academiadecodigo.escapefromhell.server.LoadLevel;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 /**
  * EscapeFromHell Created by BrunoM24 on 07/11/2017.
@@ -14,6 +19,7 @@ public class Game {
     private Grid grid;
     private View view;
     private Player player;
+    private Socket connection;
 
 
     /*
@@ -33,7 +39,17 @@ public class Game {
     *
     * */
 
-    public void start() {
+    public void start(String ip, int port) {
+
+        try {
+            connection = new Socket(ip , port);
+
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(this.connection.getInputStream());
+            System.out.println(bufferedInputStream.read());
+            System.out.println("é");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         init();
         player.moveDirection();
@@ -49,7 +65,7 @@ public class Game {
 
         refresh();
 
-        loadLevel();
+        //loadLevel();
 
         spawnPlayer(23);
 
@@ -206,7 +222,7 @@ public class Game {
     /*
     *
     * */
-
+/*
     public void loadLevel() {
 
         LoadLevel r = new LoadLevel();
@@ -229,5 +245,5 @@ public class Game {
             }
         }
     }
-
+*/
 }

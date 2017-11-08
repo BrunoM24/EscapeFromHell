@@ -9,6 +9,7 @@ public class Player {
     private Game game;
 
 
+
     public Player(View view, Game game){
 
         this.screen = view.getScreen();
