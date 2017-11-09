@@ -19,6 +19,7 @@ public class PlayerHandler implements Runnable {
     private Socket connection;
     private BufferedReader in;
     private PrintStream out;
+    private boolean readyToPlay;
 
 
     /*
@@ -41,12 +42,21 @@ public class PlayerHandler implements Runnable {
     @Override
     public void run() {
 
+
         try {
 
-            System.out.println("connected");
+            server.releaselock();
+            try {
+                server.increaseNmlock();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             server.sendMap(connection);
+
             in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             boolean shutdownRequested = false;
+
             while (!shutdownRequested) {
 
 
@@ -65,7 +75,9 @@ public class PlayerHandler implements Runnable {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        } //catch (InterruptedException e){
+            //System.err.println(e.getMessage());
+        //}
     }
 
 
@@ -88,5 +100,8 @@ public class PlayerHandler implements Runnable {
         return connection;
     }
 
+    public void startGame() {
+        readyToPlay = true;
+    }
 
 }

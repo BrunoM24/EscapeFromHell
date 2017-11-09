@@ -21,6 +21,8 @@ public class Server {
     private CopyOnWriteArrayList<PlayerHandler> playerConected;
     private int port;
     private LoadLevel loadLevel = new LoadLevel();
+
+
     //private String level;
 
 
@@ -54,7 +56,15 @@ public class Server {
                 playerConected.add(playerHandler);
 
                 cachedPool.submit(playerHandler);
+
+                if (checkNumberOfPlayers() > 3) {
+                    notifyAll();
+                }
+
             }
+
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,12 +104,9 @@ public class Server {
         }
     }
 
-    public boolean checkNumberOfPlayers() {
+    public int checkNumberOfPlayers() {
 
-        if (playerConected.size() < 2) {
-            return false;
-        }
-        return true;
+        return playerConected.size();
     }
 
     /*
@@ -111,6 +118,22 @@ public class Server {
     public void playerRemove(PlayerHandler playerHandler) {
 
         playerConected.remove(playerHandler);
+    }
+
+    public synchronized void releaselock(){
+
+        if(checkNumberOfPlayers() >=3){
+            notifyAll();
+        }
+
+
+    }
+    public synchronized void increaseNmlock() throws InterruptedException {
+
+        if(checkNumberOfPlayers() < 3){
+
+            wait();
+        }
     }
 
 }
