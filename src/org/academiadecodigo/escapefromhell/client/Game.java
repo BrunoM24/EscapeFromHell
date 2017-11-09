@@ -52,11 +52,15 @@ public class Game {
                 public void run() {
 
                     try {
-                        System.out.println("abc");
                         BufferedReader pos = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                         while (connection != null) {
-                            System.out.println("I got a square");
-                            updateGrid(pos.readLine());
+                            String read = pos.readLine();
+                            if (read.length() == 5) {
+                                updateGrid(read);
+                            } else {
+                                showPlayer(read);
+                                //System.out.println(read);
+                            }
                             refresh();
                         }
                     } catch (IOException e) {
@@ -74,13 +78,23 @@ public class Game {
 
     }
 
+    private void showPlayer(String read) {
+        int oldRow = Integer.parseInt(read.split("/")[0]);
+        int oldCol = Integer.parseInt(read.split("/")[1]);
+        int row = Integer.parseInt(read.split("/")[2]);
+        int col = Integer.parseInt(read.split("/")[3]);
+
+        System.out.println(read);
+        this.grid.updateCell(0, oldCol, oldRow);
+        this.grid.updateCell(2, col, row);
+    }
+
     private void updateGrid(String s) {
         int row = Integer.parseInt(s.split("/")[0]);
         int col = Integer.parseInt(s.split("/")[1]);
-        this.grid.updateCell(row, col);
+        this.grid.updateCell(1, row, col);
 
     }
-
 
     /*
     *
@@ -109,7 +123,8 @@ public class Game {
 
     public void drawRight() {
 
-        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1] = true;
+        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1] = 1;
+
         refresh();
         try {
             PrintStream out = new PrintStream(connection.getOutputStream());
@@ -120,14 +135,13 @@ public class Game {
 
     }
 
-
     /*
     *
     * */
 
     public void drawLeft() {
 
-        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1] = true;
+        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1] = 1;
         refresh();
         try {
             PrintStream out = new PrintStream(connection.getOutputStream());
@@ -148,14 +162,17 @@ public class Game {
 
     public void moveRight() {
 
+        int oldX = view.playerPos_X();
+        int oldY = view.playerPos_Y();
 
-        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1]) {
 
-            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() + 1]) {
+        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1] == 1) {
+
+            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() + 1] == 1) {
                 return;
             }
             //2
-            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] && grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1]) {
+            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] == 1 && grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1] == 1) {
                 return;
             }
 
@@ -170,6 +187,11 @@ public class Game {
         checkFall();
 
         refresh();
+        try {
+            new PrintStream(connection.getOutputStream()).println(oldX + "/" + oldY + "/" + view.playerPos_X() + "/" + view.playerPos_Y());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -182,14 +204,17 @@ public class Game {
 
     public void moveLeft() {
 
-        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1]) {
+        int oldX = view.playerPos_X();
+        int oldY = view.playerPos_Y();
 
-            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() - 1]) {
+        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1] == 1) {
+
+            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() - 1] == 1) {
                 return;
             }
 
             //block on top - cannot cross stair
-            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] && grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1]) {
+            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] == 1 && grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1] == 1) {
                 return;
             }
 
@@ -203,6 +228,12 @@ public class Game {
         checkFall();
 
         refresh();
+
+        try {
+            new PrintStream(connection.getOutputStream()).println(oldX + "/" + oldY + "/" + view.playerPos_X() + "/" + view.playerPos_Y());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -215,9 +246,9 @@ public class Game {
         if (this.view.playerPos_Y() == view.terminalSize_Y() - 1) {
             return;
         }
-        if (!grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()]) {
+        if (grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()] == 0) {
 
-            while (!grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()]) {
+            while (grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()] == 0) {
 
                 this.view.setPlayerPos(this.view.playerPos_X(), this.view.playerPos_Y() + 1);
 
@@ -238,8 +269,10 @@ public class Game {
         for (int row = 0; row < 30; row++) {
             for (int col = 0; col < 100; col++) {
 
-                if (grid.getGrid()[row][col]) {
+                if (grid.getGrid()[row][col] == 1) {
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.WHITE);
+                } else if (grid.getGrid()[row][col] == 2) {
+                    this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.GREEN);
                 } else {
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.BLACK);
                 }
@@ -277,11 +310,8 @@ public class Game {
 
             for (int j = 0; j < 100; j++) {
 
-                if (split[j].equals("1"))
-                    grid.getGrid()[i][j] = true;
+                this.grid.getGrid()[i][j] = Integer.parseInt(split[j]);
 
-                else
-                    grid.getGrid()[i][j] = false;
             }
         }
     }

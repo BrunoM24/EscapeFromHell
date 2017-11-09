@@ -7,14 +7,14 @@ package org.academiadecodigo.escapefromhell.client;
 public class Grid {
 
 
-    private Boolean[][] grid;
+    private int[][] grid;
     private final int cols = 100;
     private final int rows = 30;
 
 
     public Grid() {
 
-        this.grid = new Boolean[rows][cols];
+        this.grid = new int[rows][cols];
         initGrid();
     }
 
@@ -26,7 +26,7 @@ public class Grid {
 
         for (int row = 0; row < 30; row++) {
             for (int col = 0; col < 100; col++) {
-                grid[row][col] = false;
+                grid[row][col] = 0;
             }
         }
     }
@@ -35,17 +35,17 @@ public class Grid {
     *
     * */
 
-    public Boolean[][] getGrid() {
+    public int[][] getGrid() {
 
         return grid;
     }
 
-    public void update(Boolean[][] grid){
+    public void update(int[][] grid){
         this.grid = grid;
     }
 
-    public void updateCell(int row, int col){
-        this.grid[row][col] = true;
+    public void updateCell(int val, int row, int col){
+        this.grid[row][col] = val;
         System.out.println("updating "+ row + " " + col);
     }
 }
