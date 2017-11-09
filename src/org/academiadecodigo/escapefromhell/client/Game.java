@@ -123,16 +123,19 @@ public class Game {
 
     public void drawRight() {
 
-        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1] = 1;
+        if (view.playerPos_X() == view.terminalSize_X() - 1) {
+            return;
+        }
 
+        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1] = 1;
         refresh();
+
         try {
             PrintStream out = new PrintStream(connection.getOutputStream());
             out.println(view.playerPos_Y() + "/" + (view.playerPos_X() + 1));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     /*
@@ -141,15 +144,19 @@ public class Game {
 
     public void drawLeft() {
 
+        if (view.playerPos_X() == 0) {
+            return;
+        }
+
         grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1] = 1;
         refresh();
+
         try {
             PrintStream out = new PrintStream(connection.getOutputStream());
             out.println(view.playerPos_Y() + "/" + (view.playerPos_X() - 1));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
 
@@ -165,6 +172,9 @@ public class Game {
         int oldX = view.playerPos_X();
         int oldY = view.playerPos_Y();
 
+        if (view.playerPos_X() == view.terminalSize_X() - 1) {
+            return;
+        }
 
         if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1] == 1) {
 
@@ -183,6 +193,7 @@ public class Game {
             view.setPlayerPos(view.playerPos_X() + 1, view.playerPos_Y());
 
         }
+
 
         checkFall();
 
@@ -207,6 +218,10 @@ public class Game {
         int oldX = view.playerPos_X();
         int oldY = view.playerPos_Y();
 
+        if (view.playerPos_X() == 0) {
+            return;
+        }
+
         if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1] == 1) {
 
             if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() - 1] == 1) {
@@ -224,6 +239,7 @@ public class Game {
 
             view.setPlayerPos(view.playerPos_X() - 1, view.playerPos_Y());
         }
+
 
         checkFall();
 
