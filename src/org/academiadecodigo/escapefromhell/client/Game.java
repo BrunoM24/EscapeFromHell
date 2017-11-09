@@ -172,7 +172,7 @@ public class Game {
         int oldX = view.playerPos_X();
         int oldY = view.playerPos_Y();
 
-        if (view.playerPos_X() == view.terminalSize_X() - 1) {
+        if ((view.playerPos_X() == view.terminalSize_X() - 1)) {
             return;
         }
 
