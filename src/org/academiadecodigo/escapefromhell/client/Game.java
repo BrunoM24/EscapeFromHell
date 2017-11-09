@@ -6,6 +6,8 @@ import org.academiadecodigo.escapefromhell.server.LoadLevel;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * EscapeFromHell Created by BrunoM24 on 07/11/2017.
@@ -19,6 +21,9 @@ public class Game {
     private View view;
     private Player player;
     private Socket connection;
+    private LavaTimer lavaTimer;
+    private Timer timer;
+    private int rowY = 29;
 
 
     /*
@@ -31,6 +36,8 @@ public class Game {
         this.view = new View();
         this.screen = view.getScreen();
         this.player = new Player(this.view, this);
+        this.lavaTimer = new LavaTimer();
+        this.timer = new Timer();
     }
 
 
@@ -68,6 +75,10 @@ public class Game {
                     }
                 }
             }).start();
+
+
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(this.connection.getInputStream());
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -107,6 +118,16 @@ public class Game {
         //loadLevel();
 
         spawnPlayer(23);
+
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                riseLava();
+                refresh();
+            }
+        }, 1000L, 1000L);
+
 
     }
 
@@ -273,6 +294,8 @@ public class Game {
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.WHITE);
                 } else if (grid.getGrid()[row][col] == 2) {
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.GREEN);
+                } else if (grid.getGrid()[row][col] == 3) {
+                    this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.RED);
                 } else {
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.BLACK);
                 }
@@ -287,6 +310,18 @@ public class Game {
     public void harakiri(int row) {
 
         spawnPlayer(row);
+    }
+
+
+    public void riseLava() {
+
+        for (int i = 0; i < view.terminalSize_X(); i++) {
+
+
+            grid.getGrid()[rowY][i] = 3;
+
+        }
+        rowY -= 1;
     }
 
     /*
