@@ -18,7 +18,6 @@ public class Grid {
         initGrid();
     }
 
-
     /*
     *
     * */
@@ -32,7 +31,6 @@ public class Grid {
         }
     }
 
-
     /*
     *
     * */
@@ -44,5 +42,10 @@ public class Grid {
 
     public void update(Boolean[][] grid){
         this.grid = grid;
+    }
+
+    public void updateCell(int row, int col){
+        this.grid[row][col] = true;
+        System.out.println("updating "+ row + " " + col);
     }
 }

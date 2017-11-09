@@ -25,3 +25,7 @@ hs_err_pid*
 .gitignore
 .idea/
 EscapeFromHell.iml
+out
+out/artifacts/EscapeFromHell_jar/
+out/production/EscapeFromHell/META-INF/
+src/META-INF/

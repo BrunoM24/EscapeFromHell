@@ -16,7 +16,6 @@ public class Player {
         this.game = game;
     }
 
-
     /*
     *
     * */

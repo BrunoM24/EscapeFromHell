@@ -4,8 +4,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import org.academiadecodigo.escapefromhell.server.LoadLevel;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -26,12 +25,12 @@ public class Game {
     *
     * */
 
-    public Game(){
+    public Game() {
 
         this.grid = new Grid();
         this.view = new View();
         this.screen = view.getScreen();
-        this.player = new Player(this.view,this);
+        this.player = new Player(this.view, this);
     }
 
 
@@ -42,17 +41,43 @@ public class Game {
     public void start(String ip, int port) {
 
         try {
-            connection = new Socket(ip , port);
+            connection = new Socket(ip, port);
 
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(this.connection.getInputStream());
-            System.out.println(bufferedInputStream.read());
-            System.out.println("é");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            loadLevel(bufferedReader.readLine());
+            refresh();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    try {
+                        System.out.println("abc");
+                        BufferedReader pos = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                        while (connection != null) {
+                            System.out.println("I got a square");
+                            updateGrid(pos.readLine());
+                            refresh();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         init();
         player.moveDirection();
+
+    }
+
+    private void updateGrid(String s) {
+        int row = Integer.parseInt(s.split("/")[0]);
+        int col = Integer.parseInt(s.split("/")[1]);
+        this.grid.updateCell(row, col);
 
     }
 
@@ -71,9 +96,9 @@ public class Game {
 
     }
 
-    private void spawnPlayer (int row) {
+    private void spawnPlayer(int row) {
 
-        view.setPlayerPos((int)(Math.random()*view.terminalSize_X()), row);
+        view.setPlayerPos((int) (Math.random() * view.terminalSize_X()), row);
 
     }
 
@@ -86,6 +111,12 @@ public class Game {
 
         grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1] = true;
         refresh();
+        try {
+            PrintStream out = new PrintStream(connection.getOutputStream());
+            out.println(view.playerPos_Y() + "/" + (view.playerPos_X() + 1));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -98,6 +129,12 @@ public class Game {
 
         grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1] = true;
         refresh();
+        try {
+            PrintStream out = new PrintStream(connection.getOutputStream());
+            out.println(view.playerPos_Y() + "/" + (view.playerPos_X() - 1));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -112,19 +149,19 @@ public class Game {
     public void moveRight() {
 
 
-        if(grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1]){
+        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1]) {
 
-            if(grid.getGrid()[view.playerPos_Y()-1][view.playerPos_X() + 1]){
+            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() + 1]) {
                 return;
             }
             //2
-            if(grid.getGrid()[view.playerPos_Y()-1][view.playerPos_X()] && grid.getGrid()[view.playerPos_Y()][view.playerPos_X()+1]) {
+            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] && grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1]) {
                 return;
             }
 
             view.setPlayerPos(view.playerPos_X() + 1, view.playerPos_Y() - 1);
 
-        }else {
+        } else {
 
             view.setPlayerPos(view.playerPos_X() + 1, view.playerPos_Y());
 
@@ -145,20 +182,20 @@ public class Game {
 
     public void moveLeft() {
 
-        if(grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1]){
+        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1]) {
 
-            if(grid.getGrid()[view.playerPos_Y()-1][view.playerPos_X() - 1]){
+            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() - 1]) {
                 return;
             }
 
             //block on top - cannot cross stair
-            if(grid.getGrid()[view.playerPos_Y()-1][view.playerPos_X()] && grid.getGrid()[view.playerPos_Y()][view.playerPos_X()-1]) {
+            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] && grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1]) {
                 return;
             }
 
             view.setPlayerPos(view.playerPos_X() - 1, view.playerPos_Y() - 1);
 
-        }else {
+        } else {
 
             view.setPlayerPos(view.playerPos_X() - 1, view.playerPos_Y());
         }
@@ -175,16 +212,16 @@ public class Game {
     * */
     private void checkFall() {
 
-        if (this.view.playerPos_Y() == view.terminalSize_Y()-1) {
+        if (this.view.playerPos_Y() == view.terminalSize_Y() - 1) {
             return;
         }
         if (!grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()]) {
 
             while (!grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()]) {
 
-                this.view.setPlayerPos(this.view.playerPos_X(), this.view.playerPos_Y()+1);
+                this.view.setPlayerPos(this.view.playerPos_X(), this.view.playerPos_Y() + 1);
 
-                if (this.view.playerPos_Y() == view.terminalSize_Y()-1) {
+                if (this.view.playerPos_Y() == view.terminalSize_Y() - 1) {
                     break;
                 }
             }
@@ -214,7 +251,7 @@ public class Game {
     }
 
 
-    public void harakiri (int row) {
+    public void harakiri(int row) {
 
         spawnPlayer(row);
     }
@@ -222,16 +259,19 @@ public class Game {
     /*
     *
     * */
-/*
-    public void loadLevel() {
 
-        LoadLevel r = new LoadLevel();
-        r.readFile();
+
+    public void loadLevel(String map) {
+
+        //System.out.println(map);
 
         String[] split;
-        String[] resultSplit = LoadLevel.result.split("/");;
+        String[] resultSplit = map.split("/");
+        ;
+
 
         for (int i = 0; i < 30; i++) {
+
 
             split = resultSplit[i].split("");
 
@@ -245,5 +285,5 @@ public class Game {
             }
         }
     }
-*/
+
 }

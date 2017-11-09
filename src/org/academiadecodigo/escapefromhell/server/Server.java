@@ -20,12 +20,15 @@ public class Server {
     private ExecutorService cachedPool = Executors.newCachedThreadPool();
     private CopyOnWriteArrayList<PlayerHandler> playerConected;
     private int port;
+    private LoadLevel loadLevel = new LoadLevel();
+    //private String level;
 
 
-    public Server(int port){
+    public Server(int port) {
 
         this.port = port;
         playerConected = new CopyOnWriteArrayList<>();
+        //level = loadLevel.readFile();
     }
 
 
@@ -37,7 +40,7 @@ public class Server {
     * Submit the new task
     * */
 
-    public void openServer()  {
+    public void openServer() {
 
         try {
             ServerSocket server = new ServerSocket(this.port);
@@ -52,7 +55,7 @@ public class Server {
 
                 cachedPool.submit(playerHandler);
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -61,13 +64,27 @@ public class Server {
     * Broadcast message for all clients
     * connected with the player
     * */
+    public void sendMap(Socket connection) {
 
-    public void sendMessage() {
+        System.out.println("try");
+        try {
+            new PrintStream(connection.getOutputStream()).println(loadLevel.readFile());
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+        System.out.println("end");
+
+    }
+
+
+    public void sendMessage(String message) {
 
         synchronized (playerConected) {
             try {
                 for (int i = 0; i < playerConected.size(); i++) {
                     PrintStream out = new PrintStream(playerConected.get(i).getConnection().getOutputStream());
+                    out.println(message);
 
 
                 }
@@ -76,9 +93,10 @@ public class Server {
             }
         }
     }
-    public boolean checkNumberOfPlayers(){
 
-        if(playerConected.size() < 2) {
+    public boolean checkNumberOfPlayers() {
+
+        if (playerConected.size() < 2) {
             return false;
         }
         return true;
@@ -90,7 +108,7 @@ public class Server {
     * with the server
     * */
 
-    public void playerRemove(PlayerHandler playerHandler){
+    public void playerRemove(PlayerHandler playerHandler) {
 
         playerConected.remove(playerHandler);
     }

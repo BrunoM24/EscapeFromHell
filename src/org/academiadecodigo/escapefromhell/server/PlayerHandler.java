@@ -1,8 +1,10 @@
 package org.academiadecodigo.escapefromhell.server;
+
 import com.sun.tools.internal.ws.wsdl.document.soap.SOAPUse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 
@@ -10,7 +12,7 @@ import java.net.Socket;
  * Created by codecadet on 04/11/2017.
  */
 
-public class PlayerHandler implements Runnable{
+public class PlayerHandler implements Runnable {
 
 
     private Server server;
@@ -24,7 +26,7 @@ public class PlayerHandler implements Runnable{
     * Receives a Server for futures communications
     * */
 
-    public PlayerHandler(Socket client, Server server){
+    public PlayerHandler(Socket client, Server server) {
 
         this.connection = client;
         this.server = server;
@@ -42,20 +44,19 @@ public class PlayerHandler implements Runnable{
         try {
 
             System.out.println("connected");
+            server.sendMap(connection);
+            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             boolean shutdownRequested = false;
-            while (!shutdownRequested){
+            while (!shutdownRequested) {
 
-                if(!server.checkNumberOfPlayers()){
 
-                    out.println("waiting for players");
-                    continue;
-                }
                 String message;
-                if((message = in.readLine()) != null){
+                if ((message = in.readLine()) != null) {
 
-                    server.sendMessage();
+                    System.out.println(message);
+                    server.sendMessage(message);
 
-                } else{
+                } else {
 
                     shutdownRequested = true;
                     shuDownConection();
@@ -83,7 +84,7 @@ public class PlayerHandler implements Runnable{
     * Return the Socket connection
     * */
 
-    public Socket getConnection(){
+    public Socket getConnection() {
         return connection;
     }
 

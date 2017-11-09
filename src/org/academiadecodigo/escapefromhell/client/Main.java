@@ -9,8 +9,11 @@ public class Main {
     public static void main(String[] args) {
 
         Game game = new Game();
-        game.start("127.0.0.1", 6660);
-
+        if(args.length > 0){
+            game.start(args[0], 6660);
+        }else {
+            game.start("127.0.0.1", 6660);
+        }
     }
 
 }
