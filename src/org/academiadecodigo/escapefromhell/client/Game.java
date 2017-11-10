@@ -2,7 +2,6 @@ package org.academiadecodigo.escapefromhell.client;
 
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
-import org.academiadecodigo.escapefromhell.server.LoadLevel;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,7 +12,6 @@ import java.util.TimerTask;
  * EscapeFromHell Created by BrunoM24 on 07/11/2017.
  */
 
-
 public class Game {
 
     private Screen screen;
@@ -21,10 +19,8 @@ public class Game {
     private View view;
     private Player player;
     private Socket connection;
-    private LavaTimer lavaTimer;
     private Timer timer;
-    private int rowY = 29;
-
+    private int lavaLevel = 30;
 
     /*
     *
@@ -36,14 +32,8 @@ public class Game {
         this.view = new View();
         this.screen = view.getScreen();
         this.player = new Player(this.view, this);
-        this.lavaTimer = new LavaTimer();
         this.timer = new Timer();
     }
-
-
-    /*
-    *
-    * */
 
     public void start(String ip, int port) {
 
@@ -66,7 +56,6 @@ public class Game {
                                 updateGrid(read);
                             } else {
                                 showPlayer(read);
-                                //System.out.println(read);
                             }
                             refresh();
                         }
@@ -76,16 +65,14 @@ public class Game {
                 }
             }).start();
 
-
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(this.connection.getInputStream());
-
+            new BufferedInputStream(this.connection.getInputStream());
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         init();
-        player.moveDirection();
+        player.keyHandler();
 
     }
 
@@ -95,7 +82,6 @@ public class Game {
         int row = Integer.parseInt(read.split("/")[2]);
         int col = Integer.parseInt(read.split("/")[3]);
 
-        System.out.println(read);
         this.grid.updateCell(0, oldCol, oldRow);
         this.grid.updateCell(2, col, row);
     }
@@ -123,11 +109,11 @@ public class Game {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                riseLava();
+                //riseLava();
+                moveGrid();
                 refresh();
             }
-        }, 1000L, 1000L);
-
+        }, 1000L, 2000L);
 
     }
 
@@ -136,7 +122,6 @@ public class Game {
         view.setPlayerPos((int) (Math.random() * view.terminalSize_X()), row);
 
     }
-
 
     /*
     *
@@ -261,7 +246,6 @@ public class Game {
             view.setPlayerPos(view.playerPos_X() - 1, view.playerPos_Y());
         }
 
-
         checkFall();
 
         refresh();
@@ -297,6 +281,7 @@ public class Game {
         }
 
     }
+
     /*
     *
     * */
@@ -322,40 +307,23 @@ public class Game {
         screen.refresh();
     }
 
-
-    public void harakiri(int row) {
-
-        spawnPlayer(row);
-    }
-
-
     public void riseLava() {
-
+        lavaLevel -= 1;
         for (int i = 0; i < view.terminalSize_X(); i++) {
 
-
-            grid.getGrid()[rowY][i] = 3;
+            grid.getGrid()[lavaLevel][i] = 3;
 
         }
-        rowY -= 1;
+
+
     }
-
-    /*
-    *
-    * */
-
 
     public void loadLevel(String map) {
 
-        //System.out.println(map);
-
         String[] split;
         String[] resultSplit = map.split("/");
-        ;
-
 
         for (int i = 0; i < 30; i++) {
-
 
             split = resultSplit[i].split("");
 
@@ -364,6 +332,33 @@ public class Game {
                 this.grid.getGrid()[i][j] = Integer.parseInt(split[j]);
 
             }
+        }
+    }
+
+    public void moveGrid() {
+
+        int mem1;
+        int mem2 = 0;
+
+        for (int col = 0; col < 100; col++) {
+            for (int row = 0; row < 29; row++) {
+                mem1 = this.grid.getValue(row + 1, col);
+                this.grid.updateCell(mem2, row + 1, col);
+                mem2 = mem1;
+                setRowBlack();
+
+            }
+        }
+
+
+        //riseLava();
+    }
+
+    public void setRowBlack(){
+
+        for (int col = 0; col <100 ; col++) {
+
+            this.grid.updateCell(0,1,col);
         }
     }
 

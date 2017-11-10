@@ -8,8 +8,6 @@ public class Player {
     private Screen screen;
     private Game game;
 
-
-
     public Player(View view, Game game){
 
         this.screen = view.getScreen();
@@ -20,7 +18,7 @@ public class Player {
     *
     * */
 
-    public void moveDirection(){
+    public void keyHandler(){
 
         while (true) {
 
@@ -42,10 +40,6 @@ public class Player {
 
                 if (key.getCharacter() == 's') {
                     game.drawRight();
-                }
-
-                if (key.getCharacter() == 'h') {
-                    game.harakiri(0);
                 }
 
             }
