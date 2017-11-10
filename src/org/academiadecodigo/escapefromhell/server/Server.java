@@ -122,7 +122,7 @@ public class Server {
 
     public synchronized void releaselock(){
 
-        if(checkNumberOfPlayers() >=3){
+        if(checkNumberOfPlayers() >=1){
             notifyAll();
         }
 

@@ -10,9 +10,9 @@ public class Main {
 
         Game game = new Game();
         if(args.length > 0){
-            game.start(args[0], 6660);
+            game.start(args[0], 6650);
         }else {
-            game.start("127.0.0.1", 6660);
+            game.start("127.0.0.1", 6650);
         }
     }
 

@@ -50,7 +50,10 @@ public class PlayerHandler implements Runnable {
                 e.printStackTrace();
             }
 
+            System.out.println("start");
             server.sendMap(connection);
+            System.out.println("connected");
+
 
             in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             boolean shutdownRequested = false;
