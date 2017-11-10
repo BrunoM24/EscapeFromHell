@@ -20,11 +20,8 @@ public class Game {
     private Player player;
     private Socket connection;
     private Timer timer;
-    private int lavaLevel = 30;
+    private int deathRow = 30;
 
-    /*
-    *
-    * */
 
     public Game() {
 
@@ -109,8 +106,10 @@ public class Game {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                //riseLava();
-                moveGrid();
+                if(deathRow == 0)
+                    return;
+
+                riseLava();
                 refresh();
             }
         }, 1000L, 2000L);
@@ -258,6 +257,8 @@ public class Game {
     }
 
 
+
+
     /*
     * cheack if the player position is on the botton row
     * while cell below player is empty incrise pY position of the player
@@ -308,14 +309,14 @@ public class Game {
     }
 
     public void riseLava() {
-        lavaLevel -= 1;
+        deathRow --;
+
         for (int i = 0; i < view.terminalSize_X(); i++) {
 
-            grid.getGrid()[lavaLevel][i] = 3;
+
+            grid.getGrid()[deathRow][i] = 3;
 
         }
-
-
     }
 
     public void loadLevel(String map) {
