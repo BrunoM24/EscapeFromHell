@@ -34,14 +34,12 @@ public class PlayerHandler implements Runnable {
 
     }
 
-
     /*
     *
     * */
 
     @Override
     public void run() {
-
 
         try {
 

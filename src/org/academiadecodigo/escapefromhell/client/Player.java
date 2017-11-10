@@ -27,11 +27,12 @@ public class Player {
             if (key != null) {
 
                 if (key.getKind() == Key.Kind.ArrowLeft) {
-                    game.moveLeft();
+                    game.checkMove(-1);
+
                 }
 
                 if (key.getKind() == Key.Kind.ArrowRight) {
-                    game.moveRight();
+                    game.checkMove(1);
                 }
 
                 if (key.getCharacter() == 'a') {

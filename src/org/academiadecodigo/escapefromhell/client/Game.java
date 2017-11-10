@@ -103,7 +103,7 @@ public class Game {
         spawnPlayer(23);
 
 
-        timer.scheduleAtFixedRate(new TimerTask() {
+        /*timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 if(deathRow == 0)
@@ -112,7 +112,7 @@ public class Game {
                 riseLava();
                 refresh();
             }
-        }, 1000L, 2000L);
+        }, 1000L, 2000L);*/
 
     }
 
@@ -121,10 +121,6 @@ public class Game {
         view.setPlayerPos((int) (Math.random() * view.terminalSize_X()), row);
 
     }
-
-    /*
-    *
-    * */
 
     public void drawRight() {
 
@@ -143,10 +139,6 @@ public class Game {
         }
     }
 
-    /*
-    *
-    * */
-
     public void drawLeft() {
 
         if (view.playerPos_X() == 0) {
@@ -164,100 +156,38 @@ public class Game {
         }
     }
 
+    public void checkMove(int direction){
 
-    /*
-    *
-    * verify if next cell is filled
-    * if not occupy that is  a stair climb, if its a wall do nothing
-    * 2 cell above and cell to the right are fill do nothing
-    * */
+        if((direction == 1 && (view.playerPos_X() == view.terminalSize_X() - 1)) || (direction == -1 && (view.playerPos_X() == 0))){
+            return;
+        }
 
-    public void moveRight() {
+        if(grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] == 1 && grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] == 1){
+            return;
+        }
+
+        if(grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] != 1){
+            move(direction, 0);
+            return;
+        }
+
+        if(grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] == 1 && grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() + direction] != 1){
+            move(direction, 1);
+            return;
+        }
+
+    }
+
+    private void move(int direction, int row){
 
         int oldX = view.playerPos_X();
         int oldY = view.playerPos_Y();
 
-        if ((view.playerPos_X() == view.terminalSize_X() - 1)) {
-            return;
-        }
-
-        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1] == 1) {
-
-            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() + 1] == 1) {
-                return;
-            }
-            //2
-            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] == 1 && grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1] == 1) {
-                return;
-            }
-
-            view.setPlayerPos(view.playerPos_X() + 1, view.playerPos_Y() - 1);
-
-        } else {
-
-            view.setPlayerPos(view.playerPos_X() + 1, view.playerPos_Y());
-
-        }
-
+        view.setPlayerPos(view.playerPos_Y() - row, view.playerPos_X() + direction);
 
         checkFall();
-
         refresh();
-        try {
-            new PrintStream(connection.getOutputStream()).println(oldX + "/" + oldY + "/" + view.playerPos_X() + "/" + view.playerPos_Y());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
-
-
-    /*
-    *
-    * verify if next cell is filled
-    * if not occupy that is  a stair climb, if its a wall do nothing
-    * 2 cell above and cell to the left are fill do nothing
-    * */
-
-    public void moveLeft() {
-
-        int oldX = view.playerPos_X();
-        int oldY = view.playerPos_Y();
-
-        if (view.playerPos_X() == 0) {
-            return;
-        }
-
-        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1] == 1) {
-
-            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() - 1] == 1) {
-                return;
-            }
-
-            //block on top - cannot cross stair
-            if (grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] == 1 && grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1] == 1) {
-                return;
-            }
-
-            view.setPlayerPos(view.playerPos_X() - 1, view.playerPos_Y() - 1);
-
-        } else {
-
-            view.setPlayerPos(view.playerPos_X() - 1, view.playerPos_Y());
-        }
-
-        checkFall();
-
-        refresh();
-
-        try {
-            new PrintStream(connection.getOutputStream()).println(oldX + "/" + oldY + "/" + view.playerPos_X() + "/" + view.playerPos_Y());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
 
     /*
     * cheack if the player position is on the botton row
@@ -272,7 +202,7 @@ public class Game {
 
             while (grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()] == 0) {
 
-                this.view.setPlayerPos(this.view.playerPos_X(), this.view.playerPos_Y() + 1);
+                this.view.setPlayerPos(this.view.playerPos_Y() + 1, this.view.playerPos_X());
 
                 if (this.view.playerPos_Y() == view.terminalSize_Y() - 1) {
                     break;
@@ -282,10 +212,6 @@ public class Game {
         }
 
     }
-
-    /*
-    *
-    * */
 
     private void refresh() {
 
@@ -351,8 +277,6 @@ public class Game {
             }
         }
 
-
-        //riseLava();
     }
 
     public void setRowBlack(){

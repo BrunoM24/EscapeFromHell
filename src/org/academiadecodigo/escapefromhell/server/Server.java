@@ -130,7 +130,7 @@ public class Server {
     }
     public synchronized void increaseNmlock() throws InterruptedException {
 
-        if(checkNumberOfPlayers() < 3){
+        if(checkNumberOfPlayers() < 1){
 
             wait();
         }
