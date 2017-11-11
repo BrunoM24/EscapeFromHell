@@ -51,6 +51,7 @@ public class Game {
             if(menu.equals("Start")) {
 
                 loadLevel(loadLevel.readFile());
+                //spawnPlayer(25);
                 refresh();
             }
             new Thread(new Runnable() {
@@ -134,7 +135,7 @@ public class Game {
     * */
 
     public void init() {
-        spawnPlayer(25);
+
         refresh();
 
         //loadLevel();
@@ -155,7 +156,7 @@ public class Game {
 
     private void spawnPlayer(int row) {
 
-        view.setPlayerPos((int) (Math.random() * 78) + 10, row);
+        view.setPlayerPos(((int) (Math.random() * 78)) + 10, row);
 
     }
 
