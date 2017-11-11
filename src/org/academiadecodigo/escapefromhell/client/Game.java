@@ -130,7 +130,7 @@ public class Game {
     * */
     private void showPlayer(String read) {
 
-         String[] coordinates = read.split(":");
+        String[] coordinates = read.split(":");
 
         if (coordinates[0].equals("POS")) {
 
@@ -183,7 +183,7 @@ public class Game {
                 riseLava();
                 refresh();
             }
-        }, 1000L, 2000L);
+        }, 1000L, 1000L);
 
     }
 
@@ -355,11 +355,14 @@ public class Game {
     public void riseLava() {
 
         deathRow--;
+        for (int i = 11; i < (view.terminalSize_X() - 10); i++) {
 
-        for (int i = 11; i < (view.terminalSize_X() - 11); i++) {
+            for (int j = deathRow; j < view.terminalSize_Y(); j++) {
 
+                int number = ((int) (Math.random() * 2)) + 3;
+                grid.getGrid()[j][i] = number;
 
-            grid.getGrid()[deathRow][i] = 3;
+            }
 
         }
         if (view.playerPos_Y() >= deathRow) {
