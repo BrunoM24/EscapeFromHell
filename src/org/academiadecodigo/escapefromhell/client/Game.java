@@ -22,8 +22,10 @@ public class Game {
     private Timer timer;
     private int deathRow = 30;
     private boolean isDead = false;
-
+    private boolean hasWon = false;
+    private LoadWin loadWin;
     private Loadmenu loadmenu = new Loadmenu();
+    private String soulNumber = "Soul 1";
 
     private LoadLevel loadLevel;
 
@@ -36,6 +38,7 @@ public class Game {
         this.player = new Player(this.view, this);
         this.timer = new Timer();
         loadLevel = new LoadLevel();
+        loadWin = new LoadWin();
 
     }
 
@@ -156,7 +159,7 @@ public class Game {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (deathRow == 0)
+                if (deathRow == 0 || hasWon == true)
                     return;
 
                 riseLava();
@@ -171,7 +174,7 @@ public class Game {
 
         //view.setPlayerPos(((int) (Math.random() * 78)) + 10, row);
 
-        view.setPlayerPos(25, 25);
+        view.setPlayerPos(3, 70);
     }
 
     public void draw(int direction) {
@@ -232,6 +235,8 @@ public class Game {
 
         view.setPlayerPos(view.playerPos_Y() - row, view.playerPos_X() + direction);
 
+        checkWin();
+
         checkFall();
 
         checkDead();
@@ -282,11 +287,12 @@ public class Game {
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.GREEN);
                 } else if (grid.getGrid()[row][col] == 3) {
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.RED);
-                } else {
+                } else if (grid.getGrid()[row][col] == 4){
+                    this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.YELLOW);
+                }else
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.BLACK);
                 }
 
-            }
         }
 
         screen.refresh();
@@ -296,7 +302,6 @@ public class Game {
         deathRow--;
 
         for (int i = 11; i < (view.terminalSize_X() - 11); i++) {
-
 
             grid.getGrid()[deathRow][i] = 3;
 
@@ -310,6 +315,15 @@ public class Game {
 
         isDead = true;
 
+    }
+
+    public void checkWin() {
+        if(this.view.playerPos_Y() == 0) {
+
+            weHaveAWinner(loadWin.readWin());
+            loadWinnerNumber(loadWin.readWinnerNumber("1"));
+
+        }
     }
 
     public void loadLevel(String map) {
@@ -327,6 +341,51 @@ public class Game {
 
             }
         }
+    }
+
+    public void weHaveAWinner(String message) {
+
+        hasWon = true;
+
+        String[] split;
+        String[] resultSplit = message.split("/");
+
+                String result ="";
+
+        for (int i = 0; i <30; i++) {
+
+            split = resultSplit[i].split("");
+            System.out.println(split.toString() + " Linha" + i);
+
+            for (int j = 0; j < 79;j++) {
+
+                result += split[j];
+                System.out.println("win" + Integer.parseInt(split[j]));
+
+                this.grid.getGrid()[i][j] = Integer.parseInt(split[j]);
+            }
+            System.out.println(result);
+
+
+        }
+
+    }
+
+    public void loadWinnerNumber(String number) {
+
+        String[] split;
+        String[] resultSplit = number.split("/");
+
+        for (int i = 14; i <30; i++) {
+
+            split = resultSplit[i].split("");
+
+            for (int j = 63; j < 79;j++) {
+                this.grid.getGrid()[i][j] = Integer.parseInt(split[j]);
+            }
+
+        }
+
     }
 
    /*
