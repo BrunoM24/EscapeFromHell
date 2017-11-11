@@ -45,6 +45,7 @@ public class Grid {
     }
 
     public void updateCell(int val, int row, int col){
+
         this.grid[row][col] = val;
     }
 

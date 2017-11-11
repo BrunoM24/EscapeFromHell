@@ -86,6 +86,10 @@ public class Game {
 
                                 updateGrid(read);
                             }
+
+                            showPlayer(read);
+
+
                             refresh();
                         }
                     } catch (IOException e) {
@@ -108,12 +112,14 @@ public class Game {
     * */
     private void playerID(String serverMessage) {
 
+        if(serverMessage.length() != 5)
+            return;
+
         if(serverMessage.split(":")[0].equals("ID")){
 
             soulNumber = serverMessage.split(":")[1];
             this.screen.putString(91, 2, "YOU ARE:" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
             this.screen.putString(91, 4, soulNumber , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-
 
         }
 
@@ -125,13 +131,23 @@ public class Game {
     * */
     private void showPlayer(String read) {
 
-        int oldRow = Integer.parseInt(read.split("/")[0]);
-        int oldCol = Integer.parseInt(read.split("/")[1]);
-        int row = Integer.parseInt(read.split("/")[2]);
-        int col = Integer.parseInt(read.split("/")[3]);
 
-        this.grid.updateCell(0, oldCol, oldRow);
-        this.grid.updateCell(2, col, row);
+
+        if(read.length() != 11)
+            return;
+
+        System.out.println(read);
+            int oldRow = Integer.parseInt(read.split("P")[0]);
+            int oldCol = Integer.parseInt(read.split("P")[1]);
+            int row = Integer.parseInt(read.split("P")[2]);
+            int col = Integer.parseInt(read.split("P")[3]);
+            System.out.println("old col " + oldCol);
+            System.out.println("old row " + oldRow);
+        System.out.println("col " + col);
+        System.out.println("row " + row);
+            this.grid.updateCell(0, oldRow, oldCol);
+            this.grid.updateCell(2, row,col);
+
     }
 
 
@@ -140,12 +156,12 @@ public class Game {
     * */
     private void updateGrid(String s) {
 
-        if(s.split(":")[0] != null)
+        if(s.length() != 5)
             return;
 
-            int row = Integer.parseInt(s.split("/")[0]);
-            int col = Integer.parseInt(s.split("/")[1]);
-            this.grid.updateCell(1, row, col);
+        int row = Integer.parseInt(s.split("/")[0]);
+        int col = Integer.parseInt(s.split("/")[1]);
+        this.grid.updateCell(1, row, col);
 
     }
 
@@ -255,7 +271,12 @@ public class Game {
 
         view.setPlayerPos(view.playerPos_Y() - row, view.playerPos_X() + direction);
 
-
+        try {
+            PrintStream out = new PrintStream(connection.getOutputStream());
+            out.println(oldY + "P" + oldX + "P" + view.playerPos_Y() + "P" + view.playerPos_X());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         checkFall();
         checkDead();
@@ -345,7 +366,7 @@ public class Game {
 
         try {
            PrintStream out = new PrintStream(connection.getOutputStream());
-           out.println("DEAD:"+ soulNumber);
+           out.println("DEAD: "+ soulNumber);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -391,6 +412,10 @@ public class Game {
        }
    }
 
+
+    /*
+    *
+    * */
     public void setDeadPlayer(String deadPlayer) {
 
           if(deadPlayer.split(":")[0].equals("DEAD")){
@@ -410,14 +435,18 @@ public class Game {
                   break;
 
           }
-            this.screen.putString(91, 2, "YOU ARE:" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-            this.screen.putString(91, 4, soulNumber , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+            this.screen.putString(90, 2, "YOU ARE:" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+            this.screen.putString(90, 4, "teste" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
 
 
         }
 
     }
 
+
+    /*
+    *
+    * */
     public void playerList(){
         this.screen.putString(1, 1, "SOUL 1" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
         this.screen.putString(1, 4, "SOUL 2" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
