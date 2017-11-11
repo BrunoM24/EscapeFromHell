@@ -57,7 +57,6 @@ public class Server {
 
             }
 
-
             for (PlayerHandler player : playerConected) {
                 System.out.println("submiting player");
                 cachedPool.submit(player);

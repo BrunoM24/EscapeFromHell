@@ -45,6 +45,7 @@ public class PlayerHandler implements Runnable {
 
             server.sendMap(connection);
 
+
         try {
             in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             boolean shutdownRequested = false;

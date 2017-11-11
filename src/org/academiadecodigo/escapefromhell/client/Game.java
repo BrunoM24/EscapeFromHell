@@ -141,7 +141,7 @@ public class Game {
 
         //loadLevel();
 
-        spawnPlayer(23);
+        spawnPlayer(25);
 
 
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -164,7 +164,7 @@ public class Game {
 
     private void spawnPlayer(int row) {
 
-        view.setPlayerPos((int) (Math.random() * view.terminalSize_X()), row);
+        view.setPlayerPos((int) (Math.random() * 78) +10, row);
 
     }
 
@@ -295,7 +295,7 @@ public class Game {
     public void riseLava() {
         deathRow --;
 
-        for (int i = 0; i < view.terminalSize_X(); i++) {
+        for (int i = 11; i < (view.terminalSize_X() -11); i++) {
 
 
             grid.getGrid()[deathRow][i] = 3;
