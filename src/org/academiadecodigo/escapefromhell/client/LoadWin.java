@@ -19,7 +19,7 @@ public class LoadWin {
 
         try {
 
-            reader = new FileReader("win.txt");
+            reader = new FileReader("2.txt");
             BufferedReader br = new BufferedReader(reader);
 
             while ((aux = br.readLine()) != null) {

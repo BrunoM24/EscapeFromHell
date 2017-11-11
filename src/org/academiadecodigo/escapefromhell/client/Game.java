@@ -350,21 +350,15 @@ public class Game {
         String[] split;
         String[] resultSplit = message.split("/");
 
-                String result ="";
 
         for (int i = 0; i <30; i++) {
 
             split = resultSplit[i].split("");
-            System.out.println(split.toString() + " Linha" + i);
 
-            for (int j = 0; j < 79;j++) {
-
-                result += split[j];
-                System.out.println("win" + Integer.parseInt(split[j]));
+            for (int j = 0; j < 100;j++) {
 
                 this.grid.getGrid()[i][j] = Integer.parseInt(split[j]);
             }
-            System.out.println(result);
 
 
         }
