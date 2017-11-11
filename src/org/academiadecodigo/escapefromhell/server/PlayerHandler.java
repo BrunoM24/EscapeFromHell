@@ -21,7 +21,6 @@ public class PlayerHandler implements Runnable {
     private PrintStream out;
     private boolean readyToPlay;
 
-
     /*
     * Constructor recives an accepted client Socket from the server
     * Receives a Server for futures communications
@@ -43,7 +42,7 @@ public class PlayerHandler implements Runnable {
 
         System.out.println("SENDING MAP!");
 
-            server.sendMap(connection);
+        server.sendMap(connection);
 
 
         try {

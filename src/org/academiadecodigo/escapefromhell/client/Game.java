@@ -21,7 +21,6 @@ public class Game {
     private Socket connection;
     private Timer timer;
     private int deathRow = 30;
-
     private boolean isDead = false;
 
     private Loadmenu loadmenu = new Loadmenu();
@@ -52,7 +51,8 @@ public class Game {
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String menu = bufferedReader.readLine();
-            if(menu.equals("Start")) {
+
+            if (menu.equals("Start")) {
 
                 loadLevel(loadLevel.readFile());
                 //spawnPlayer(25);
@@ -67,12 +67,18 @@ public class Game {
                         while (pos != null) {
 
                             String read = bufferedReader.readLine();
-                            updateGrid(read);
 
-                            if (read.length() == 5) {
+                            if (read.split(" ")[0].equals("cell")) {
 
-                                updateGrid(read);
+                                updateGrid(read.split(" ")[1]);
                             }
+
+                            /*if (read.split(" ")[0].equals("player")) {
+
+                                showPlayer(read.split(" ")[1]);
+                            }*/
+
+                            //showPlayer(read);
                             refresh();
                         }
                     } catch (IOException e) {
@@ -112,7 +118,7 @@ public class Game {
 
     }
 
-    private void showPlayer(String read) {
+    /*private void showPlayer(String read) {
         int oldRow = Integer.parseInt(read.split("/")[0]);
         int oldCol = Integer.parseInt(read.split("/")[1]);
         int row = Integer.parseInt(read.split("/")[2]);
@@ -120,7 +126,7 @@ public class Game {
 
         this.grid.updateCell(0, oldCol, oldRow);
         this.grid.updateCell(2, col, row);
-    }
+    }*/
 
 
     /*
@@ -128,6 +134,7 @@ public class Game {
     * */
 
     private void updateGrid(String s) {
+        System.out.println(s);
         int row = Integer.parseInt(s.split("/")[0]);
         int col = Integer.parseInt(s.split("/")[1]);
         this.grid.updateCell(1, row, col);
@@ -162,8 +169,9 @@ public class Game {
 
     private void spawnPlayer(int row) {
 
-        view.setPlayerPos(((int) (Math.random() * 78)) + 10, row);
+        //view.setPlayerPos(((int) (Math.random() * 78)) + 10, row);
 
+        view.setPlayerPos(25, 25);
     }
 
     public void draw(int direction) {
@@ -177,33 +185,17 @@ public class Game {
         }
 
 
-        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() +direction] = 1;
+        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] = 1;
         refresh();
 
         try {
             PrintStream out = new PrintStream(connection.getOutputStream());
-            out.println(view.playerPos_Y() + "/" + (view.playerPos_X() + direction));
+            out.println("cell" + " " + view.playerPos_Y() + "/" + (view.playerPos_X() + direction));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    /*public void drawLeft() {
-
-        if (view.playerPos_X() == 0) {
-            return;
-        }
-
-        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1] = 1;
-        refresh();
-
-        try {
-            PrintStream out = new PrintStream(connection.getOutputStream());
-            out.println(view.playerPos_Y() + "/" + (view.playerPos_X() - 1));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
 
     public void checkMove(int direction) {
 
@@ -212,7 +204,7 @@ public class Game {
             return;
         }
 
-        if ((direction == 1 && (view.playerPos_X() == view.terminalSize_X() - 1)) || (direction == -1 && (view.playerPos_X() == 0))){
+        if ((direction == 1 && (view.playerPos_X() == view.terminalSize_X() - 1)) || (direction == -1 && (view.playerPos_X() == 0))) {
 
             return;
         }
@@ -241,7 +233,15 @@ public class Game {
         view.setPlayerPos(view.playerPos_Y() - row, view.playerPos_X() + direction);
 
         checkFall();
+
         checkDead();
+
+        /*try {
+            PrintStream out = new PrintStream(connection.getOutputStream());
+            out.println("player" + " " + oldY +"/"+ oldX+ "/" + view.playerPos_Y() + "/" + (view.playerPos_X() + direction));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
 
         refresh();
     }
@@ -303,8 +303,8 @@ public class Game {
         }
     }
 
-    public void checkDead(){
-        if (!(this.view.playerPos_Y() == deathRow-1)) {
+    public void checkDead() {
+        if (!(this.view.playerPos_Y() == deathRow - 1)) {
             return;
         }
 
