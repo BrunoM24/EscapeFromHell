@@ -191,7 +191,7 @@ public class Game {
     * */
     private void spawnPlayer(int row) {
 
-        screen.setCursorPosition(((int) (Math.random() * 78)) + 10, row);
+        screen.setCursorPosition(((int) (Math.random() * 77)) + 11, row);
 
     }
 
