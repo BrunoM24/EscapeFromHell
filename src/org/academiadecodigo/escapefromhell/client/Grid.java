@@ -25,7 +25,7 @@ public class Grid {
     private void initGrid() {
 
         for (int row = 0; row < 30; row++) {
-            for (int col = 0; col < 100; col++) {
+            for (int col = 10; col < 90; col++) {
                 grid[row][col] = 0;
             }
         }

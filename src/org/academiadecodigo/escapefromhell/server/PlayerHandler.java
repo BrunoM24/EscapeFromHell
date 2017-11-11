@@ -1,11 +1,6 @@
 package org.academiadecodigo.escapefromhell.server;
 
-import com.sun.tools.internal.ws.wsdl.document.soap.SOAPUse;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -20,6 +15,7 @@ public class PlayerHandler implements Runnable {
     private BufferedReader in;
     private PrintStream out;
     private boolean readyToPlay;
+    private int ID;
 
 
     /*
@@ -27,10 +23,12 @@ public class PlayerHandler implements Runnable {
     * Receives a Server for futures communications
     * */
 
-    public PlayerHandler(Socket client, Server server) {
+    public PlayerHandler(Socket client, Server server, int ID) {
 
         this.connection = client;
         this.server = server;
+        this.ID = ID;
+
 
     }
 
@@ -41,10 +39,16 @@ public class PlayerHandler implements Runnable {
     @Override
     public void run() {
 
-        System.out.println("SENDING MAP!");
+        try {
 
-            server.sendMap(connection);
+            PrintStream out = new PrintStream(connection.getOutputStream());
+            out.println("ID:Soul " + ID);
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        server.sendStartMessage(connection);
 
         try {
             in = new BufferedReader(new InputStreamReader(connection.getInputStream()));

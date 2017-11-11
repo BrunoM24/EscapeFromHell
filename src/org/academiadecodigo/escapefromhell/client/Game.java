@@ -1,6 +1,7 @@
 package org.academiadecodigo.escapefromhell.client;
 
 import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.ScreenCharacterStyle;
 import com.googlecode.lanterna.terminal.Terminal;
 
 import java.io.*;
@@ -25,6 +26,7 @@ public class Game {
     private Loadmenu loadmenu = new Loadmenu();
     private LoadLevel loadLevel;
     private final int START_ROW = 25;
+    private String soulNumber;
 
 
     public Game() {
@@ -53,13 +55,21 @@ public class Game {
             connection = new Socket(ip, port);
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String menu = bufferedReader.readLine();
-            if(menu.equals("Start")) {
+            String serverMessage;
 
-                loadLevel(loadLevel.readFile());
 
-                refresh();
+            while (!(serverMessage = bufferedReader.readLine()).equals("Start")) {
+
+                playerID(serverMessage);
+
             }
+
+            loadLevel(loadLevel.readFile());
+            playerList();
+
+
+            refresh();
+
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -69,6 +79,7 @@ public class Game {
                         while (pos != null) {
 
                             String read = bufferedReader.readLine();
+                            setDeadPlayer(read);
                             updateGrid(read);
 
                             if (read.length() == 5) {
@@ -89,6 +100,22 @@ public class Game {
 
         init();
         player.keyHandler();
+
+    }
+
+    /*
+    *
+    * */
+    private void playerID(String serverMessage) {
+
+        if(serverMessage.split(":")[0].equals("ID")){
+
+            soulNumber = serverMessage.split(":")[1];
+            this.screen.putString(91, 2, "YOU ARE:" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+            this.screen.putString(91, 4, soulNumber , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+
+
+        }
 
     }
 
@@ -113,9 +140,12 @@ public class Game {
     * */
     private void updateGrid(String s) {
 
-        int row = Integer.parseInt(s.split("/")[0]);
-        int col = Integer.parseInt(s.split("/")[1]);
-        this.grid.updateCell(1, row, col);
+        if(s.split(":")[0] != null)
+            return;
+
+            int row = Integer.parseInt(s.split("/")[0]);
+            int col = Integer.parseInt(s.split("/")[1]);
+            this.grid.updateCell(1, row, col);
 
     }
 
@@ -218,10 +248,14 @@ public class Game {
     * */
     private void move(int direction, int row) {
 
+        checkDead();
+
         int oldX = view.playerPos_X();
         int oldY = view.playerPos_Y();
 
         view.setPlayerPos(view.playerPos_Y() - row, view.playerPos_X() + direction);
+
+
 
         checkFall();
         checkDead();
@@ -262,7 +296,7 @@ public class Game {
     private void refresh() {
 
         for (int row = 0; row < 30; row++) {
-            for (int col = 0; col < 100; col++) {
+            for (int col = 10; col < 90; col++) {
 
                 if (grid.getGrid()[row][col] == 1) {
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.WHITE);
@@ -302,13 +336,24 @@ public class Game {
     * */
     public void checkDead(){
 
-        if (!(this.view.playerPos_Y() == deathRow-1)) {
+        if (!(this.view.playerPos_Y() >= deathRow - 1)) {
 
             return;
         }
             isDead = true;
+
+
+        try {
+           PrintStream out = new PrintStream(connection.getOutputStream());
+           out.println("DEAD:"+ soulNumber);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+            //screen.setCursorPosition(null);
+            //refresh();
             //Change color to red;
-        //Send status string
+            //Send status string
 
     }
 
@@ -325,7 +370,7 @@ public class Game {
 
             split = resultSplit[i].split("");
 
-            for (int j = 0; j < 100; j++) {
+            for (int j = 10; j < 90; j++) {
 
                 this.grid.getGrid()[i][j] = Integer.parseInt(split[j]);
 
@@ -346,4 +391,38 @@ public class Game {
        }
    }
 
+    public void setDeadPlayer(String deadPlayer) {
+
+          if(deadPlayer.split(":")[0].equals("DEAD")){
+
+          switch (deadPlayer.split(":")[1]){
+              case "Soul 1":
+                  this.screen.putString(1, 2, "SOUL LOST" , Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+                  break;
+              case "Soul 2":
+                  this.screen.putString(1, 5, "SOUL LOST" , Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+                      break;
+              case "Soul 3":
+                  this.screen.putString(1, 8, "SOUL LOST" , Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+                  break;
+              case "Soul 4":
+                  this.screen.putString(1, 11, "SOUL LOST" , Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+                  break;
+
+          }
+            this.screen.putString(91, 2, "YOU ARE:" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+            this.screen.putString(91, 4, soulNumber , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+
+
+        }
+
+    }
+
+    public void playerList(){
+        this.screen.putString(1, 1, "SOUL 1" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+        this.screen.putString(1, 4, "SOUL 2" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+        this.screen.putString(1, 7, "SOUL 3" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+        this.screen.putString(1, 10, "SOUL 4" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+
+    }
 }

@@ -54,7 +54,7 @@ public class Server {
             while (playerConected.size() < 2) {
 
                 Socket connection = server.accept();
-                PlayerHandler playerHandler = new PlayerHandler(connection, this);
+                PlayerHandler playerHandler = new PlayerHandler(connection, this, playerConected.size() + 1);
                 playerConected.add(playerHandler);
 
             }
@@ -65,15 +65,19 @@ public class Server {
             }
             for (PlayerHandler player : playerConected) {
                 System.out.println("submiting player");
+
                 cachedPool.submit(player);
+
             }
 
             System.out.println("all players submitted. game is starting");
 
 
+
+
         while (true) {
             Socket connection = server.accept();
-            PlayerHandler playerHandler = new PlayerHandler(connection, this);
+            PlayerHandler playerHandler = new PlayerHandler(connection, this, playerConected.size() +1);
             playerConected.add(playerHandler);
             cachedPool.submit(playerHandler);
         }
@@ -87,7 +91,7 @@ public class Server {
     * Broadcast message for all clients
     * connected with the player
     * */
-    public void sendMap(Socket connection) {
+    public void sendStartMessage(Socket connection) {
 
 
         try {
@@ -120,7 +124,12 @@ public class Server {
         }
     }
 
-    public int checkNumberOfPlayers() {
+
+    /*
+    *
+    * */
+    public int numberOfPlayers() {
+
         return playerConected.size();
     }
 
@@ -135,21 +144,5 @@ public class Server {
         playerConected.remove(playerHandler);
     }
 
-
-    public synchronized void releaselock(){
-
-        if(checkNumberOfPlayers() >=3){
-            notifyAll();
-        }
-
-
-    }
-    public synchronized void increaseNmlock() throws InterruptedException {
-
-        if(checkNumberOfPlayers() < 3){
-
-            wait();
-        }
-    }
 
 }
