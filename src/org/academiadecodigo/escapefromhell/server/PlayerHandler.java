@@ -45,12 +45,12 @@ public class PlayerHandler implements Runnable {
 
         try {
 
-            server.releaselock();
+           /* server.releaselock();
             try {
                 server.increaseNmlock();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             server.sendMap(connection);
 

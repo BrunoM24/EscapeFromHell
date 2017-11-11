@@ -57,9 +57,9 @@ public class Server {
 
                 cachedPool.submit(playerHandler);
 
-                if (checkNumberOfPlayers() > 3) {
+               /* if (checkNumberOfPlayers() > 0) {
                     notifyAll();
-                }
+                }*/
 
             }
 
