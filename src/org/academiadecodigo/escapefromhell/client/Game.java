@@ -21,12 +21,10 @@ public class Game {
     private Socket connection;
     private Timer timer;
     private int deathRow = 30;
-
     private boolean isDead = false;
-
     private Loadmenu loadmenu = new Loadmenu();
-
     private LoadLevel loadLevel;
+    private final int START_ROW = 25;
 
 
     public Game() {
@@ -40,11 +38,15 @@ public class Game {
 
     }
 
+    /*
+    *
+    * */
     public void start(String ip, int port) {
 
         loadLevel(loadmenu.readFile());
-        refresh();
+        screen.setCursorPosition(null);
 
+        refresh();
 
         try {
 
@@ -55,7 +57,7 @@ public class Game {
             if(menu.equals("Start")) {
 
                 loadLevel(loadLevel.readFile());
-                //spawnPlayer(25);
+
                 refresh();
             }
             new Thread(new Runnable() {
@@ -84,35 +86,18 @@ public class Game {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Im here");
+
         init();
         player.keyHandler();
 
     }
 
+
     /*
     *
     * */
-
-    private void loadMenu(String menuMap) {
-
-        String[] split;
-        String[] resultSplit = menuMap.split("/");
-
-        for (int i = 0; i < 30; i++) {
-
-            split = resultSplit[i].split("");
-
-            for (int j = 0; j < 100; j++) {
-
-                this.grid.getGrid()[i][j] = Integer.parseInt(split[j]);
-
-            }
-        }
-
-    }
-
     private void showPlayer(String read) {
+
         int oldRow = Integer.parseInt(read.split("/")[0]);
         int oldCol = Integer.parseInt(read.split("/")[1]);
         int row = Integer.parseInt(read.split("/")[2]);
@@ -126,8 +111,8 @@ public class Game {
     /*
     *
     * */
-
     private void updateGrid(String s) {
+
         int row = Integer.parseInt(s.split("/")[0]);
         int col = Integer.parseInt(s.split("/")[1]);
         this.grid.updateCell(1, row, col);
@@ -137,18 +122,17 @@ public class Game {
     /*
     *
     * */
-
     public void init() {
 
+
+        spawnPlayer(START_ROW);
+
         refresh();
-
-        //loadLevel();
-
-        spawnPlayer(25);
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+
                 if (deathRow == 0)
                     return;
 
@@ -160,12 +144,19 @@ public class Game {
     }
 
 
+    /*
+    *
+    * */
     private void spawnPlayer(int row) {
 
-        view.setPlayerPos(((int) (Math.random() * 78)) + 10, row);
+        screen.setCursorPosition(((int) (Math.random() * 78)) + 10, row);
 
     }
 
+
+    /*
+    *
+    * */
     public void draw(int direction) {
 
         if (isDead) {
@@ -180,6 +171,7 @@ public class Game {
         grid.getGrid()[view.playerPos_Y()][view.playerPos_X() +direction] = 1;
         refresh();
 
+
         try {
             PrintStream out = new PrintStream(connection.getOutputStream());
             out.println(view.playerPos_Y() + "/" + (view.playerPos_X() + direction));
@@ -188,23 +180,10 @@ public class Game {
         }
     }
 
-    /*public void drawLeft() {
 
-        if (view.playerPos_X() == 0) {
-            return;
-        }
-
-        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() - 1] = 1;
-        refresh();
-
-        try {
-            PrintStream out = new PrintStream(connection.getOutputStream());
-            out.println(view.playerPos_Y() + "/" + (view.playerPos_X() - 1));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
-
+    /*
+    *
+    * */
     public void checkMove(int direction) {
 
 
@@ -233,6 +212,10 @@ public class Game {
 
     }
 
+
+    /*
+    *
+    * */
     private void move(int direction, int row) {
 
         int oldX = view.playerPos_X();
@@ -251,6 +234,7 @@ public class Game {
     * cheack if the player position is on the botton row
     * while cell below player is empty incrise pY position of the player
     * */
+
     private void checkFall() {
 
         if (this.view.playerPos_Y() == view.terminalSize_Y() - 1) {
@@ -271,6 +255,10 @@ public class Game {
 
     }
 
+
+    /*
+    *
+    * */
     private void refresh() {
 
         for (int row = 0; row < 30; row++) {
@@ -292,7 +280,12 @@ public class Game {
         screen.refresh();
     }
 
+
+    /*
+    *
+    * */
     public void riseLava() {
+
         deathRow--;
 
         for (int i = 11; i < (view.terminalSize_X() - 11); i++) {
@@ -303,15 +296,26 @@ public class Game {
         }
     }
 
+
+    /*
+    *
+    * */
     public void checkDead(){
+
         if (!(this.view.playerPos_Y() == deathRow-1)) {
+
             return;
         }
-
-        isDead = true;
+            isDead = true;
+            //Change color to red;
+        //Send status string
 
     }
 
+
+    /*
+    *
+    * */
     public void loadLevel(String map) {
 
         String[] split;
@@ -329,34 +333,17 @@ public class Game {
         }
     }
 
-   /*
-    *methods for moving game, not working very well
+
+    /*
     *
-     */
-  /*  public void moveGrid() {
+    * */
+    public void checkWin(){
 
-        int mem1;
-        int mem2 = 0;
+       if (this.view.playerPos_Y() == 0) {
 
-        for (int col = 0; col < 100; col++) {
-            for (int row = 0; row < 29; row++) {
-                mem1 = this.grid.getValue(row + 1, col);
-                this.grid.updateCell(mem2, row + 1, col);
-                mem2 = mem1;
-                setRowBlack();
-
-            }
-        }
-
-    }
-
-
-    public void setRowBlack(){
-
-        for (int col = 0; col <100 ; col++) {
-
-            this.grid.updateCell(0,1,col);
-        }
-    }*/
+           isDead = true;
+           //Load win file and send everyone
+       }
+   }
 
 }
