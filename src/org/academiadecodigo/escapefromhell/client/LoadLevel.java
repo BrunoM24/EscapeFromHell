@@ -1,4 +1,4 @@
-package org.academiadecodigo.escapefromhell.server;
+package org.academiadecodigo.escapefromhell.client;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

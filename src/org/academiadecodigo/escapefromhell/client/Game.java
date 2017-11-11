@@ -22,6 +22,7 @@ public class Game {
     private Timer timer;
     private int deathRow = 30;
     private Loadmenu loadmenu = new Loadmenu();
+    private LoadLevel loadLevel;
 
 
     public Game() {
@@ -31,38 +32,41 @@ public class Game {
         this.screen = view.getScreen();
         this.player = new Player(this.view, this);
         this.timer = new Timer();
-
+        loadLevel = new LoadLevel();
 
     }
 
     public void start(String ip, int port) {
 
+        loadLevel(loadmenu.readFile());
+        refresh();
 
 
         try {
 
             connection = new Socket(ip, port);
-            System.out.println("here1");
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String menu = bufferedReader.readLine();
+            if(menu.equals("Start")) {
 
-
-            loadLevel(bufferedReader.readLine());
-            System.out.println("here2");
-            refresh();
-
+                loadLevel(loadLevel.readFile());
+                refresh();
+            }
             new Thread(new Runnable() {
                 @Override
                 public void run() {
 
                     try {
                         BufferedReader pos = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                        while (connection != null) {
-                            String read = pos.readLine();
+                        while (pos != null) {
+
+                            String read = bufferedReader.readLine();
+                            updateGrid(read);
+
                             if (read.length() == 5) {
+
                                 updateGrid(read);
-                            } else {
-                                showPlayer(read);
                             }
                             refresh();
                         }
@@ -72,12 +76,10 @@ public class Game {
                 }
             }).start();
 
-            new BufferedInputStream(this.connection.getInputStream());
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        System.out.println("Im here");
         init();
         player.keyHandler();
 
@@ -132,35 +134,28 @@ public class Game {
     * */
 
     public void init() {
-
+        spawnPlayer(25);
         refresh();
 
         //loadLevel();
 
-        spawnPlayer(25);
-
-
-        /*timer.scheduleAtFixedRate(new TimerTask() {
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if(deathRow == 0)
+                if (deathRow == 0)
                     return;
 
                 riseLava();
                 refresh();
             }
-        }, 1000L, 2000L);*/
+        }, 1000L, 2000L);
 
     }
 
 
-    /*
-    *
-    * */
-
     private void spawnPlayer(int row) {
 
-        view.setPlayerPos((int) (Math.random() * 78) +10, row);
+        view.setPlayerPos((int) (Math.random() * 78) + 10, row);
 
     }
 
@@ -198,29 +193,29 @@ public class Game {
         }
     }
 
-    public void checkMove(int direction){
+    public void checkMove(int direction) {
 
-        if((direction == 1 && (view.playerPos_X() == view.terminalSize_X() - 1)) || (direction == -1 && (view.playerPos_X() == 0))){
+        if ((direction == 1 && (view.playerPos_X() == view.terminalSize_X() - 1)) || (direction == -1 && (view.playerPos_X() == 0))) {
             return;
         }
 
-        if(grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] == 1 && grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] == 1){
+        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] == 1 && grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] == 1) {
             return;
         }
 
-        if(grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] != 1){
+        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] != 1) {
             move(direction, 0);
             return;
         }
 
-        if(grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] == 1 && grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() + direction] != 1){
+        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] == 1 && grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() + direction] != 1) {
             move(direction, 1);
             return;
         }
 
     }
 
-    private void move(int direction, int row){
+    private void move(int direction, int row) {
 
         int oldX = view.playerPos_X();
         int oldY = view.playerPos_Y();
@@ -278,9 +273,9 @@ public class Game {
     }
 
     public void riseLava() {
-        deathRow --;
+        deathRow--;
 
-        for (int i = 11; i < (view.terminalSize_X() -11); i++) {
+        for (int i = 11; i < (view.terminalSize_X() - 11); i++) {
 
 
             grid.getGrid()[deathRow][i] = 3;
@@ -305,7 +300,11 @@ public class Game {
         }
     }
 
-    public void moveGrid() {
+   /*
+    *methods for moving game, not working very well
+    *
+     */
+  /*  public void moveGrid() {
 
         int mem1;
         int mem2 = 0;
@@ -329,6 +328,6 @@ public class Game {
 
             this.grid.updateCell(0,1,col);
         }
-    }
+    }*/
 
 }

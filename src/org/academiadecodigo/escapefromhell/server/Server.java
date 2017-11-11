@@ -1,5 +1,7 @@
 package org.academiadecodigo.escapefromhell.server;
 
+import org.academiadecodigo.escapefromhell.client.LoadLevel;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -49,14 +51,18 @@ public class Server {
         try {
             server = new ServerSocket(this.port);
 
-            while (playerConected.size() < 3) {
+            while (playerConected.size() < 2) {
 
                 Socket connection = server.accept();
                 PlayerHandler playerHandler = new PlayerHandler(connection, this);
                 playerConected.add(playerHandler);
 
             }
-
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             for (PlayerHandler player : playerConected) {
                 System.out.println("submiting player");
                 cachedPool.submit(player);
@@ -83,14 +89,14 @@ public class Server {
     * */
     public void sendMap(Socket connection) {
 
-        System.out.println("try");
+
         try {
-            new PrintStream(connection.getOutputStream()).println(loadLevel.readFile());
+            new PrintStream(connection.getOutputStream()).println("Start");
         } catch (IOException e1) {
             e1.printStackTrace();
         }
 
-        System.out.println("end");
+
 
     }
 
