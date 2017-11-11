@@ -112,16 +112,13 @@ public class Game {
     * */
     private void playerID(String serverMessage) {
 
-        if(serverMessage.length() != 5)
+        if (serverMessage.length() != 9)
             return;
 
-        if(serverMessage.split(":")[0].equals("ID")){
+        soulNumber = serverMessage.split(":")[1];
+        this.screen.putString(91, 2, "YOU ARE:", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+        this.screen.putString(91, 4, soulNumber, Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
 
-            soulNumber = serverMessage.split(":")[1];
-            this.screen.putString(91, 2, "YOU ARE:" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-            this.screen.putString(91, 4, soulNumber , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-
-        }
 
     }
 
@@ -132,21 +129,20 @@ public class Game {
     private void showPlayer(String read) {
 
 
-
-        if(read.length() != 11)
+        if (read.length() != 11)
             return;
 
         System.out.println(read);
-            int oldRow = Integer.parseInt(read.split("P")[0]);
-            int oldCol = Integer.parseInt(read.split("P")[1]);
-            int row = Integer.parseInt(read.split("P")[2]);
-            int col = Integer.parseInt(read.split("P")[3]);
-            System.out.println("old col " + oldCol);
-            System.out.println("old row " + oldRow);
+        int oldRow = Integer.parseInt(read.split("P")[0]);
+        int oldCol = Integer.parseInt(read.split("P")[1]);
+        int row = Integer.parseInt(read.split("P")[2]);
+        int col = Integer.parseInt(read.split("P")[3]);
+        System.out.println("old col " + oldCol);
+        System.out.println("old row " + oldRow);
         System.out.println("col " + col);
         System.out.println("row " + row);
-            this.grid.updateCell(0, oldRow, oldCol);
-            this.grid.updateCell(2, row,col);
+        this.grid.updateCell(0, oldRow, oldCol);
+        this.grid.updateCell(2, row, col);
 
     }
 
@@ -156,7 +152,7 @@ public class Game {
     * */
     private void updateGrid(String s) {
 
-        if(s.length() != 5)
+        if (s.length() != 5)
             return;
 
         int row = Integer.parseInt(s.split("/")[0]);
@@ -214,7 +210,7 @@ public class Game {
         }
 
 
-        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() +direction] = 1;
+        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] = 1;
         refresh();
 
 
@@ -237,7 +233,7 @@ public class Game {
             return;
         }
 
-        if ((direction == 1 && (view.playerPos_X() == view.terminalSize_X() - 1)) || (direction == -1 && (view.playerPos_X() == 0))){
+        if ((direction == 1 && (view.playerPos_X() == view.terminalSize_X() - 1)) || (direction == -1 && (view.playerPos_X() == 0))) {
 
             return;
         }
@@ -264,7 +260,9 @@ public class Game {
     * */
     private void move(int direction, int row) {
 
-        checkDead();
+        if(checkDead()){
+            return;
+        }
 
         int oldX = view.playerPos_X();
         int oldY = view.playerPos_Y();
@@ -297,9 +295,19 @@ public class Game {
         }
         if (grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()] == 0) {
 
+
             while (grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()] == 0) {
 
+                int oldY = this.view.playerPos_Y();
+                int oldX = this.view.playerPos_X();
+
                 this.view.setPlayerPos(this.view.playerPos_Y() + 1, this.view.playerPos_X());
+                try {
+                    PrintStream out = new PrintStream(connection.getOutputStream());
+                    out.println(oldY + "P" + oldX + "P" + view.playerPos_Y() + "P" + view.playerPos_X());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 if (this.view.playerPos_Y() == view.terminalSize_Y() - 1) {
                     break;
@@ -355,26 +363,28 @@ public class Game {
     /*
     *
     * */
-    public void checkDead(){
+    public boolean checkDead() {
 
         if (!(this.view.playerPos_Y() >= deathRow - 1)) {
 
-            return;
+            return false;
         }
-            isDead = true;
+
+        isDead = true;
 
 
         try {
-           PrintStream out = new PrintStream(connection.getOutputStream());
-           out.println("DEAD: "+ soulNumber);
+            PrintStream out = new PrintStream(connection.getOutputStream());
+            out.println("RIP:" + soulNumber);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return isDead;
 
-            //screen.setCursorPosition(null);
-            //refresh();
-            //Change color to red;
-            //Send status string
+        //screen.setCursorPosition(null);
+        //refresh();
+        //Change color to red;
+        //Send status string
 
     }
 
@@ -403,14 +413,14 @@ public class Game {
     /*
     *
     * */
-    public void checkWin(){
+    public void checkWin() {
 
-       if (this.view.playerPos_Y() == 0) {
+        if (this.view.playerPos_Y() == 0) {
 
-           isDead = true;
-           //Load win file and send everyone
-       }
-   }
+            isDead = true;
+            //Load win file and send everyone
+        }
+    }
 
 
     /*
@@ -418,28 +428,28 @@ public class Game {
     * */
     public void setDeadPlayer(String deadPlayer) {
 
-          if(deadPlayer.split(":")[0].equals("DEAD")){
-
-          switch (deadPlayer.split(":")[1]){
-              case "Soul 1":
-                  this.screen.putString(1, 2, "SOUL LOST" , Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-                  break;
-              case "Soul 2":
-                  this.screen.putString(1, 5, "SOUL LOST" , Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-                      break;
-              case "Soul 3":
-                  this.screen.putString(1, 8, "SOUL LOST" , Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-                  break;
-              case "Soul 4":
-                  this.screen.putString(1, 11, "SOUL LOST" , Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-                  break;
-
-          }
-            this.screen.putString(90, 2, "YOU ARE:" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-            this.screen.putString(90, 4, "teste" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-
+        if (deadPlayer.length() != 10) {
+            return;
+        }
+        System.out.println(deadPlayer);
+        switch (deadPlayer.split(":")[1]) {
+            case "Soul 1":
+                this.screen.putString(1, 2, "SOUL LOST", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+                break;
+            case "Soul 2":
+                this.screen.putString(1, 5, "SOUL LOST", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+                break;
+            case "Soul 3":
+                this.screen.putString(1, 8, "SOUL LOST", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+                break;
+            case "Soul 4":
+                this.screen.putString(1, 11, "SOUL LOST", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+                break;
 
         }
+
+        refresh();
+
 
     }
 
@@ -447,11 +457,11 @@ public class Game {
     /*
     *
     * */
-    public void playerList(){
-        this.screen.putString(1, 1, "SOUL 1" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-        this.screen.putString(1, 4, "SOUL 2" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-        this.screen.putString(1, 7, "SOUL 3" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-        this.screen.putString(1, 10, "SOUL 4" , Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+    public void playerList() {
+        this.screen.putString(1, 1, "SOUL 1", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+        this.screen.putString(1, 4, "SOUL 2", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+        this.screen.putString(1, 7, "SOUL 3", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+        this.screen.putString(1, 10, "SOUL 4", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
 
     }
 }
