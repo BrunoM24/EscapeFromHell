@@ -7,74 +7,39 @@ public class View {
 
     private Screen screen;
 
-
-    /*
-    *
-    * */
-
-    public View(){
+    public View() {
 
         this.screen = TerminalFacade.createScreen();
         screen.startScreen();
     }
 
-
-    /*
-    *
-    * */
-
-    public int terminalSize_X(){
+    public int terminalSize_X() {
 
         return this.screen.getTerminalSize().getColumns();
     }
 
-
-    /*
-    *
-    * */
-
-    public int terminalSize_Y(){
+    public int terminalSize_Y() {
 
         return this.screen.getTerminalSize().getRows();
     }
 
-
-    /*
-    *
-    * */
-
-    public int playerPos_X(){
+    public int playerPos_X() {
 
         return this.screen.getCursorPosition().getColumn();
     }
 
-
-    /*
-    *
-    * */
-
-    public int playerPos_Y(){
+    public int playerPos_Y() {
 
         return this.screen.getCursorPosition().getRow();
     }
-
-
-    /*
-    *
-    * */
 
     public Screen getScreen() {
 
         return screen;
     }
 
+    public void setPlayerPos(int rows, int cols) {
 
-    /*
-    *
-    * */
-
-    public void setPlayerPos(int cols, int rows){
-
-        screen.setCursorPosition(cols,rows);
+        screen.setCursorPosition(cols, rows);
     }
 }
