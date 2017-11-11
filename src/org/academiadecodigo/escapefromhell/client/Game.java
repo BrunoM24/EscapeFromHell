@@ -260,7 +260,7 @@ public class Game {
     * */
     private void move(int direction, int row) {
 
-        if(checkDead()){
+        if(isDead){
             return;
         }
 
@@ -277,7 +277,7 @@ public class Game {
         }
 
         checkFall();
-        checkDead();
+       // checkDead();
 
         refresh();
     }
@@ -357,18 +357,22 @@ public class Game {
             grid.getGrid()[deathRow][i] = 3;
 
         }
+        if (view.playerPos_Y() == deathRow){
+
+            checkDead();
+        }
     }
 
 
     /*
     *
     * */
-    public boolean checkDead() {
+    public void checkDead() {
 
-        if (!(this.view.playerPos_Y() >= deathRow - 1)) {
+        /*if (!(this.view.playerPos_Y() >= deathRow - 1)) {
 
             return false;
-        }
+        }*/
 
         isDead = true;
 
@@ -379,7 +383,7 @@ public class Game {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return isDead;
+
 
         //screen.setCursorPosition(null);
         //refresh();
