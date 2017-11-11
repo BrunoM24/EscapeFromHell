@@ -41,20 +41,11 @@ public class PlayerHandler implements Runnable {
     @Override
     public void run() {
 
-        try {
+        System.out.println("SENDING MAP!");
 
-            server.releaselock();
-            try {
-                server.increaseNmlock();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            System.out.println("start");
             server.sendMap(connection);
-            System.out.println("connected");
 
-
+        try {
             in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             boolean shutdownRequested = false;
 
@@ -76,9 +67,7 @@ public class PlayerHandler implements Runnable {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } //catch (InterruptedException e){
-            //System.err.println(e.getMessage());
-        //}
+        }
     }
 
 

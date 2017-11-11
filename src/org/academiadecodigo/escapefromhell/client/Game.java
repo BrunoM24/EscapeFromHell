@@ -21,7 +21,11 @@ public class Game {
     private Socket connection;
     private Timer timer;
     private int deathRow = 30;
+<<<<<<< HEAD
     private boolean isDead = false;
+=======
+    private Loadmenu loadmenu = new Loadmenu();
+>>>>>>> acf0ebb01fb0f0a8bcaedbe2c1d062778263da5c
 
 
     public Game() {
@@ -31,15 +35,24 @@ public class Game {
         this.screen = view.getScreen();
         this.player = new Player(this.view, this);
         this.timer = new Timer();
+
+
     }
 
     public void start(String ip, int port) {
 
+
+
         try {
+
             connection = new Socket(ip, port);
+            System.out.println("here1");
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+
             loadLevel(bufferedReader.readLine());
+            System.out.println("here2");
             refresh();
 
             new Thread(new Runnable() {
@@ -74,6 +87,28 @@ public class Game {
 
     }
 
+    /*
+    *
+    * */
+
+    private void loadMenu(String menuMap) {
+
+        String[] split;
+        String[] resultSplit = menuMap.split("/");
+
+        for (int i = 0; i < 30; i++) {
+
+            split = resultSplit[i].split("");
+
+            for (int j = 0; j < 100; j++) {
+
+                this.grid.getGrid()[i][j] = Integer.parseInt(split[j]);
+
+            }
+        }
+
+    }
+
     private void showPlayer(String read) {
         int oldRow = Integer.parseInt(read.split("/")[0]);
         int oldCol = Integer.parseInt(read.split("/")[1]);
@@ -83,6 +118,11 @@ public class Game {
         this.grid.updateCell(0, oldCol, oldRow);
         this.grid.updateCell(2, col, row);
     }
+
+
+    /*
+    *
+    * */
 
     private void updateGrid(String s) {
         int row = Integer.parseInt(s.split("/")[0]);
@@ -116,6 +156,11 @@ public class Game {
         }, 1000L, 2000L);
 
     }
+
+
+    /*
+    *
+    * */
 
     private void spawnPlayer(int row) {
 
@@ -200,6 +245,7 @@ public class Game {
 
         refresh();
     }
+
 
     /*
     * cheack if the player position is on the botton row
@@ -299,6 +345,7 @@ public class Game {
         }
 
     }
+
 
     public void setRowBlack(){
 
