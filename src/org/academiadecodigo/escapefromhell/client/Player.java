@@ -36,11 +36,11 @@ public class Player {
                 }
 
                 if (key.getCharacter() == 'a') {
-                    game.drawLeft();
+                    game.draw(-1);
                 }
 
                 if (key.getCharacter() == 's') {
-                    game.drawRight();
+                    game.draw(1);
                 }
 
             }

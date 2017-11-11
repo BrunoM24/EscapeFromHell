@@ -43,7 +43,7 @@ public class PlayerHandler implements Runnable {
 
         System.out.println("SENDING MAP!");
 
-        server.sendMap(connection);
+            server.sendMap(connection);
 
 
         try {

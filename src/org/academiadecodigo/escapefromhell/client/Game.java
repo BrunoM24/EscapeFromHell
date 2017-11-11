@@ -21,7 +21,11 @@ public class Game {
     private Socket connection;
     private Timer timer;
     private int deathRow = 30;
+
+    private boolean isDead = false;
+
     private Loadmenu loadmenu = new Loadmenu();
+
     private LoadLevel loadLevel;
 
 
@@ -140,6 +144,8 @@ public class Game {
 
         //loadLevel();
 
+        spawnPlayer(25);
+
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -160,24 +166,29 @@ public class Game {
 
     }
 
-    public void drawRight() {
+    public void draw(int direction) {
 
-        if (view.playerPos_X() == view.terminalSize_X() - 1) {
+        if (isDead) {
             return;
         }
 
-        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + 1] = 1;
+        if (view.playerPos_X() == view.terminalSize_X() - 1 || view.playerPos_X() == 0) {
+            return;
+        }
+
+
+        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() +direction] = 1;
         refresh();
 
         try {
             PrintStream out = new PrintStream(connection.getOutputStream());
-            out.println(view.playerPos_Y() + "/" + (view.playerPos_X() + 1));
+            out.println(view.playerPos_Y() + "/" + (view.playerPos_X() + direction));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void drawLeft() {
+    /*public void drawLeft() {
 
         if (view.playerPos_X() == 0) {
             return;
@@ -192,11 +203,17 @@ public class Game {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public void checkMove(int direction) {
 
-        if ((direction == 1 && (view.playerPos_X() == view.terminalSize_X() - 1)) || (direction == -1 && (view.playerPos_X() == 0))) {
+
+        if (isDead) {
+            return;
+        }
+
+        if ((direction == 1 && (view.playerPos_X() == view.terminalSize_X() - 1)) || (direction == -1 && (view.playerPos_X() == 0))){
+
             return;
         }
 
@@ -224,6 +241,8 @@ public class Game {
         view.setPlayerPos(view.playerPos_Y() - row, view.playerPos_X() + direction);
 
         checkFall();
+        checkDead();
+
         refresh();
     }
 
@@ -282,6 +301,15 @@ public class Game {
             grid.getGrid()[deathRow][i] = 3;
 
         }
+    }
+
+    public void checkDead(){
+        if (!(this.view.playerPos_Y() == deathRow-1)) {
+            return;
+        }
+
+        isDead = true;
+
     }
 
     public void loadLevel(String map) {

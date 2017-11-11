@@ -135,4 +135,21 @@ public class Server {
         playerConected.remove(playerHandler);
     }
 
+
+    public synchronized void releaselock(){
+
+        if(checkNumberOfPlayers() >=3){
+            notifyAll();
+        }
+
+
+    }
+    public synchronized void increaseNmlock() throws InterruptedException {
+
+        if(checkNumberOfPlayers() < 3){
+
+            wait();
+        }
+    }
+
 }

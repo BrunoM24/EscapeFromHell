@@ -8,7 +8,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("server");
-        Server server = new Server(6660);
+        Server server = new Server(6650);
         server.openServer();
 
 
