@@ -27,6 +27,8 @@ public class Game {
     private LoadLevel loadLevel;
     private final int START_ROW = 25;
     private String soulNumber;
+    private LoadWin loadWin;
+    private boolean hasWon = false;
 
 
     public Game() {
@@ -128,22 +130,22 @@ public class Game {
     * */
     private void showPlayer(String read) {
 
+         String[] coordinates = read.split(":");
 
-        if (read.length() != 11)
-            return;
+        if (coordinates[0].equals("POS")) {
 
-        System.out.println(read);
-        int oldRow = Integer.parseInt(read.split("P")[0]);
-        int oldCol = Integer.parseInt(read.split("P")[1]);
-        int row = Integer.parseInt(read.split("P")[2]);
-        int col = Integer.parseInt(read.split("P")[3]);
-        System.out.println("old col " + oldCol);
-        System.out.println("old row " + oldRow);
-        System.out.println("col " + col);
-        System.out.println("row " + row);
-        this.grid.updateCell(0, oldRow, oldCol);
-        this.grid.updateCell(2, row, col);
-
+            String[] newCoordinates = coordinates[1].split("/");
+            int oldRow = Integer.parseInt(newCoordinates[0]);
+            int oldCol = Integer.parseInt(newCoordinates[1]);
+            int row = Integer.parseInt(newCoordinates[2]);
+            int col = Integer.parseInt(newCoordinates[3]);
+            System.out.println("old col " + oldCol);
+            System.out.println("old row " + oldRow);
+            System.out.println("col " + col);
+            System.out.println("row " + row);
+            this.grid.updateCell(0, oldRow, oldCol);
+            this.grid.updateCell(2, row, col);
+        }
     }
 
 
@@ -151,14 +153,14 @@ public class Game {
     *
     * */
     private void updateGrid(String s) {
+        String[] coordinates = s.split(":");
+        if (s.split(":")[0].equals("CELL")) {
+            String[] newCoordinates = coordinates[1].split("/");
 
-        if (s.length() != 5)
-            return;
-
-        int row = Integer.parseInt(s.split("/")[0]);
-        int col = Integer.parseInt(s.split("/")[1]);
-        this.grid.updateCell(1, row, col);
-
+            int row = Integer.parseInt(newCoordinates[0]);
+            int col = Integer.parseInt(newCoordinates[1]);
+            this.grid.updateCell(1, row, col);
+        }
     }
 
     /*
@@ -167,7 +169,7 @@ public class Game {
     public void init() {
 
 
-        spawnPlayer(START_ROW);
+        spawnPlayer(4);
 
         refresh();
 
@@ -216,7 +218,7 @@ public class Game {
 
         try {
             PrintStream out = new PrintStream(connection.getOutputStream());
-            out.println(view.playerPos_Y() + "/" + (view.playerPos_X() + direction));
+            out.println("CELL:" + view.playerPos_Y() + "/" + (view.playerPos_X() + direction));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -260,9 +262,10 @@ public class Game {
     * */
     private void move(int direction, int row) {
 
-        if(isDead){
+        if (isDead) {
             return;
         }
+
 
         int oldX = view.playerPos_X();
         int oldY = view.playerPos_Y();
@@ -271,13 +274,13 @@ public class Game {
 
         try {
             PrintStream out = new PrintStream(connection.getOutputStream());
-            out.println(oldY + "P" + oldX + "P" + view.playerPos_Y() + "P" + view.playerPos_X());
+            out.println("POS:" + oldY + "/" + oldX + "/" + view.playerPos_Y() + "/" + view.playerPos_X());
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        checkWin();
         checkFall();
-       // checkDead();
+        // checkDead();
 
         refresh();
     }
@@ -304,7 +307,7 @@ public class Game {
                 this.view.setPlayerPos(this.view.playerPos_Y() + 1, this.view.playerPos_X());
                 try {
                     PrintStream out = new PrintStream(connection.getOutputStream());
-                    out.println(oldY + "P" + oldX + "P" + view.playerPos_Y() + "P" + view.playerPos_X());
+                    out.println("POS:" + oldY + "/" + oldX + "/" + view.playerPos_Y() + "/" + view.playerPos_X());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -333,6 +336,8 @@ public class Game {
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.GREEN);
                 } else if (grid.getGrid()[row][col] == 3) {
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.RED);
+                } else if (grid.getGrid()[row][col] == 4) {
+                    this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.YELLOW);
                 } else {
                     this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.BLACK);
                 }
@@ -357,7 +362,7 @@ public class Game {
             grid.getGrid()[deathRow][i] = 3;
 
         }
-        if (view.playerPos_Y() == deathRow){
+        if (view.playerPos_Y() >= deathRow) {
 
             checkDead();
         }
@@ -405,7 +410,7 @@ public class Game {
 
             split = resultSplit[i].split("");
 
-            for (int j = 10; j < 90; j++) {
+            for (int j = 11; j < 90; j++) {
 
                 this.grid.getGrid()[i][j] = Integer.parseInt(split[j]);
 
@@ -413,46 +418,19 @@ public class Game {
         }
     }
 
-
-    /*
-    *
-    * */
-    public void checkWin() {
-
-        if (this.view.playerPos_Y() == 0) {
-
-            isDead = true;
-            //Load win file and send everyone
-        }
-    }
-
-
     /*
     *
     * */
     public void setDeadPlayer(String deadPlayer) {
 
-        if (deadPlayer.length() != 10) {
-            return;
-        }
-        System.out.println(deadPlayer);
-        switch (deadPlayer.split(":")[1]) {
-            case "Soul 1":
-                this.screen.putString(1, 2, "SOUL LOST", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-                break;
-            case "Soul 2":
-                this.screen.putString(1, 5, "SOUL LOST", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-                break;
-            case "Soul 3":
-                this.screen.putString(1, 8, "SOUL LOST", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-                break;
-            case "Soul 4":
-                this.screen.putString(1, 11, "SOUL LOST", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-                break;
+        if (deadPlayer.split(":")[0].equals("RIP")) {
 
-        }
+            System.out.println(deadPlayer);
+            int number = Integer.parseInt(deadPlayer.split(" ")[1]) - 1;
+            this.screen.putString(1, 2 + number * 3, "SOUL LOST", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
 
-        refresh();
+            refresh();
+        }
 
 
     }
@@ -467,5 +445,36 @@ public class Game {
         this.screen.putString(1, 7, "SOUL 3", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
         this.screen.putString(1, 10, "SOUL 4", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
 
+    }
+
+    public void checkWin() {
+        if (this.view.playerPos_Y() == 0) {
+            System.out.println("winner1");
+            weHaveAWinner(loadWin.readWine());
+            System.out.println("winner2");
+
+        }
+    }
+
+
+    public void weHaveAWinner(String message) {
+        System.out.println("I got in");
+        hasWon = true;
+
+        String[] split;
+        String[] resultSplit = message.split("/");
+
+        System.out.println("I got the power");
+        for (int i = 0; i < 30; i++) {
+
+            split = resultSplit[i].split("");
+
+            for (int j = 11; j < 90; j++) {
+
+                this.grid.getGrid()[i][j] = Integer.parseInt(split[j]);
+            }
+
+
+        }
     }
 }
