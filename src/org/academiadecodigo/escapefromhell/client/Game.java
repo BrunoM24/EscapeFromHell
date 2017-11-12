@@ -49,7 +49,7 @@ public class Game {
     public void start(String ip, int port) {
 
         loadLevel(loadmenu.readFile());
-        this.screen.putString(45, 29, "WAITING FOR SOULS", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+        this.screen.putString(40, 29, "WAITING FOR SOULS", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
         screen.setCursorPosition(null);
 
         refresh();
@@ -220,7 +220,7 @@ public class Game {
 
         grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] = 1;
         refresh();
-933337673
+
         try {
             PrintStream out = new PrintStream(connection.getOutputStream());
             out.println("CELL:" + view.playerPos_Y() + "/" + (view.playerPos_X() + direction));
