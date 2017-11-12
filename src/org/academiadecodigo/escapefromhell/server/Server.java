@@ -53,7 +53,7 @@ public class Server {
         try {
             server = new ServerSocket(this.port);
 
-            while (playerConected.size() < 3) {
+            while (playerConected.size() < 4) {
 
                 Socket connection = server.accept();
                 PlayerHandler playerHandler = new PlayerHandler(connection, this, playerConected.size() + 1);
