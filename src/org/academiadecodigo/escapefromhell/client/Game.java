@@ -25,10 +25,11 @@ public class Game {
     private boolean isDead = false;
     private Loadmenu loadmenu = new Loadmenu();
     private LoadLevel loadLevel;
-    private final int START_ROW = 25;
+    private final int START_ROW = 24;
     private String soulNumber;
     private LoadWin loadWin;
     private boolean hasWon = false;
+    private String playerID;
 
 
     public Game() {
@@ -48,6 +49,7 @@ public class Game {
     public void start(String ip, int port) {
 
         loadLevel(loadmenu.readFile());
+        this.screen.putString(45, 29, "WAITING FOR SOULS", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
         screen.setCursorPosition(null);
 
         refresh();
@@ -61,13 +63,15 @@ public class Game {
 
 
             while (!(serverMessage = bufferedReader.readLine()).equals("Start")) {
-
+                playerID = serverMessage;
                 playerID(serverMessage);
 
             }
 
             loadLevel(loadLevel.readFile());
+            screen.clear();
             playerList();
+            playerID(playerID);
 
 
             refresh();
@@ -327,7 +331,7 @@ public class Game {
     * */
     private void refresh() {
 
-        for (int row = 0; row < 30; row++) {
+        for (int row = 0; row < 29; row++) {
             for (int col = 10; col < 90; col++) {
 
                 if (grid.getGrid()[row][col] == 1) {
@@ -355,7 +359,7 @@ public class Game {
     public void riseLava() {
 
         deathRow--;
-        for (int i = 11; i < (view.terminalSize_X() - 10); i++) {
+        for (int i = 12; i < (view.terminalSize_X() - 11); i++) {
 
             for (int j = deathRow; j < view.terminalSize_Y(); j++) {
 
@@ -409,7 +413,7 @@ public class Game {
         String[] split;
         String[] resultSplit = map.split("/");
 
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 29; i++) {
 
             split = resultSplit[i].split("");
 
