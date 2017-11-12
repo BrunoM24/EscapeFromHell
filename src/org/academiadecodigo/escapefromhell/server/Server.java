@@ -1,6 +1,6 @@
 package org.academiadecodigo.escapefromhell.server;
 
-import org.academiadecodigo.escapefromhell.client.LoadLevel;
+import org.academiadecodigo.escapefromhell.client.Loader;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -22,7 +22,9 @@ public class Server {
     private ExecutorService cachedPool = Executors.newCachedThreadPool();
     private CopyOnWriteArrayList<PlayerHandler> playerConected;
     private int port;
-    private LoadLevel loadLevel = new LoadLevel();
+
+    // Esta prop. nunca é usada. retirar?
+    private Loader loadLevel = new Loader();
 
 
     //private String level;
@@ -32,7 +34,7 @@ public class Server {
 
         this.port = port;
         playerConected = new CopyOnWriteArrayList<>();
-        //level = loadLevel.readFile();
+        //level = loadScreen.readFile(); aqui está
     }
 
 
@@ -51,7 +53,7 @@ public class Server {
         try {
             server = new ServerSocket(this.port);
 
-            while (playerConected.size() < 2) {
+            while (playerConected.size() < 3) {
 
                 Socket connection = server.accept();
                 PlayerHandler playerHandler = new PlayerHandler(connection, this, playerConected.size() + 1);

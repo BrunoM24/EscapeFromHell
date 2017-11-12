@@ -6,6 +6,8 @@ import com.googlecode.lanterna.terminal.Terminal;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -23,13 +25,12 @@ public class Game {
     private Timer timer;
     private int deathRow = 30;
     private boolean isDead = false;
-    private Loadmenu loadmenu = new Loadmenu();
-    private LoadLevel loadLevel;
+    private Loader loader;
     private final int START_ROW = 24;
     private String soulNumber;
-    private LoadWin loadWin = new LoadWin();
     private boolean hasWon = false;
     private String playerID;
+    private int numberOfPlayers = 4;
 
 
     public Game() {
@@ -39,7 +40,7 @@ public class Game {
         this.screen = view.getScreen();
         this.player = new Player(this.view, this);
         this.timer = new Timer();
-        loadLevel = new LoadLevel();
+        loader = new Loader();
 
     }
 
@@ -48,7 +49,7 @@ public class Game {
     * */
     public void start(String ip, int port) {
 
-        loadLevel(loadmenu.readFile());
+        loadScreen(loader.readFile("Menu"));
         this.screen.putString(45, 29, "WAITING FOR SOULS", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
         screen.setCursorPosition(null);
 
@@ -68,7 +69,7 @@ public class Game {
 
             }
 
-            loadLevel(loadLevel.readFile());
+            loadScreen(loader.readFile("Nivel1"));
             screen.clear();
             playerList();
             playerID(playerID);
@@ -124,7 +125,6 @@ public class Game {
         soulNumber = serverMessage.split(":")[1];
         this.screen.putString(91, 2, "YOU ARE:", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
         this.screen.putString(91, 4, soulNumber, Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-
 
     }
 
@@ -220,8 +220,8 @@ public class Game {
 
         grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] = 1;
         refresh();
-933337673
         try {
+
             PrintStream out = new PrintStream(connection.getOutputStream());
             out.println("CELL:" + view.playerPos_Y() + "/" + (view.playerPos_X() + direction));
         } catch (IOException e) {
@@ -413,7 +413,7 @@ public class Game {
     /*
     *
     * */
-    public void loadLevel(String map) {
+    public void loadScreen(String map) {
 
         String[] split;
         String[] resultSplit = map.split("/");
@@ -430,9 +430,17 @@ public class Game {
         }
     }
 
+    public void weHaveAWinner(String message) {
+
+        hasWon = true;
+
+        loadScreen(message);
+
+    }
     /*
     *
     * */
+
     public void setDeadPlayer(String deadPlayer) {
 
         if (deadPlayer.split(":")[0].equals("RIP")) {
@@ -447,47 +455,25 @@ public class Game {
 
     }
 
-
     /*
     *
     * */
+
     public void playerList() {
-        this.screen.putString(1, 1, "SOUL 1", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-        this.screen.putString(1, 4, "SOUL 2", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-        this.screen.putString(1, 7, "SOUL 3", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-        this.screen.putString(1, 10, "SOUL 4", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+
+        for (int i = 0; i < numberOfPlayers; i++) {
+
+            this.screen.putString(1, 1 + i*3, "SOUL "+(i+1), Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+
+        }
 
     }
 
     public void checkWin() {
         if (this.view.playerPos_Y() == 0) {
-            System.out.println("winner1");
-            //loadLevel(loadLevel.readFile());
-            weHaveAWinner(loadWin.readWine());
-            System.out.println("winner2");
+            weHaveAWinner(loader.readFile(soulNumber.split(" ")[1]));
 
         }
     }
 
-
-    public void weHaveAWinner(String message) {
-        System.out.println("I got in");
-        hasWon = true;
-
-        String[] split;
-        String[] resultSplit = message.split("/");
-
-        System.out.println("I got the power");
-        for (int i = 0; i < 29; i++) {
-
-            split = resultSplit[i].split("");
-
-            for (int j = 11; j < 90; j++) {
-
-                this.grid.getGrid()[i][j] = Integer.parseInt(split[j]);
-            }
-
-
-        }
-    }
 }

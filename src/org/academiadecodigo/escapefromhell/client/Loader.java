@@ -1,29 +1,28 @@
 package org.academiadecodigo.escapefromhell.client;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-/**
- * Created by codecadet on 11/11/17.
- */
-public class LoadWin {
+public class Loader {
 
 
     static String result = "";
     private String aux = "";
 
-    public String readWine() {
+    public String readFile(String file){
+
+        result = "";
+        aux = "";
 
         FileReader reader = null;
 
         try {
 
-            reader = new FileReader("1.txt");
-            BufferedReader brWin = new BufferedReader(reader);
+            reader = new FileReader(file+".txt");
+            BufferedReader br = new BufferedReader(reader);
 
-            while ((aux = brWin.readLine()) != null) {
+            while ((aux = br.readLine()) != null) {
 
                 result += (aux + "/");
 
@@ -36,14 +35,11 @@ public class LoadWin {
             try {
                 reader.close();
 
+
             }catch (IOException ex){
 
             }
         }
-        System.out.println(result);
         return result;
     }
 }
-
-
-
