@@ -27,7 +27,7 @@ public class Game {
     private LoadLevel loadLevel;
     private final int START_ROW = 24;
     private String soulNumber;
-    private LoadWin loadWin;
+    private LoadWin loadWin = new LoadWin();
     private boolean hasWon = false;
     private String playerID;
 
@@ -184,6 +184,9 @@ public class Game {
                 if (deathRow == 0)
                     return;
 
+                if (isDead || hasWon) {
+                    return;
+                }
                 riseLava();
                 refresh();
             }
@@ -207,7 +210,7 @@ public class Game {
     * */
     public void draw(int direction) {
 
-        if (isDead) {
+        if (isDead || hasWon) {
             return;
         }
 
@@ -215,11 +218,9 @@ public class Game {
             return;
         }
 
-
         grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] = 1;
         refresh();
-
-
+933337673
         try {
             PrintStream out = new PrintStream(connection.getOutputStream());
             out.println("CELL:" + view.playerPos_Y() + "/" + (view.playerPos_X() + direction));
@@ -236,6 +237,10 @@ public class Game {
 
 
         if (isDead) {
+            return;
+        }
+
+        if (hasWon) {
             return;
         }
 
@@ -266,7 +271,7 @@ public class Game {
     * */
     private void move(int direction, int row) {
 
-        if (isDead) {
+        if (isDead || hasWon) {
             return;
         }
 
@@ -457,6 +462,7 @@ public class Game {
     public void checkWin() {
         if (this.view.playerPos_Y() == 0) {
             System.out.println("winner1");
+            //loadLevel(loadLevel.readFile());
             weHaveAWinner(loadWin.readWine());
             System.out.println("winner2");
 
@@ -472,7 +478,7 @@ public class Game {
         String[] resultSplit = message.split("/");
 
         System.out.println("I got the power");
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 29; i++) {
 
             split = resultSplit[i].split("");
 

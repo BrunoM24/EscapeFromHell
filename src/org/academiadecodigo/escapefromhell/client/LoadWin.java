@@ -20,10 +20,10 @@ public class LoadWin {
 
         try {
 
-            reader = new FileReader("Menu.txt");
-            BufferedReader br = new BufferedReader(reader);
+            reader = new FileReader("1.txt");
+            BufferedReader brWin = new BufferedReader(reader);
 
-            while ((aux = br.readLine()) != null) {
+            while ((aux = brWin.readLine()) != null) {
 
                 result += (aux + "/");
 
@@ -40,6 +40,7 @@ public class LoadWin {
 
             }
         }
+        System.out.println(result);
         return result;
     }
 }
