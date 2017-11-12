@@ -50,6 +50,7 @@ public class Game {
     public void start(String ip, int port) {
 
         loadScreen(loader.readFile("Menu"));
+
         this.screen.putString(45, 29, "WAITING FOR SOULS", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
         screen.setCursorPosition(null);
 
@@ -220,6 +221,7 @@ public class Game {
 
         grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] = 1;
         refresh();
+
         try {
 
             PrintStream out = new PrintStream(connection.getOutputStream());
