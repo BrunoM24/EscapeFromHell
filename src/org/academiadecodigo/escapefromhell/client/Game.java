@@ -87,6 +87,7 @@ public class Game {
                         while (pos != null) {
 
                             String read = bufferedReader.readLine();
+                            checkForWinner(read);
                             setDeadPlayer(read);
                             updateGrid(read);
 
@@ -114,6 +115,8 @@ public class Game {
         player.keyHandler();
 
     }
+
+
 
     /*
     *
@@ -454,6 +457,18 @@ public class Game {
             refresh();
         }
 
+    }
+
+    public void checkForWinner(String winningPlayer) {
+
+        if (winningPlayer.split(":")[0].equals("WIN")) {
+
+            isDead = true;
+
+            loadScreen(loader.readFile(winningPlayer.split(":")[1].split(" ")[1]));
+
+        }
+
 
     }
 
@@ -472,7 +487,15 @@ public class Game {
     }
 
     public void checkWin() {
+
         if (this.view.playerPos_Y() == 0) {
+
+             try {
+            PrintStream out = new PrintStream(connection.getOutputStream());
+            out.println("WIN:" + soulNumber);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
             weHaveAWinner(loader.readFile(soulNumber.split(" ")[1]));
 
         }
