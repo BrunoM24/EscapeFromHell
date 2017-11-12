@@ -49,7 +49,7 @@ public class Game {
     public void start(String ip, int port) {
 
         loadLevel(loadmenu.readFile());
-        this.screen.putString(40git, 29, "WAITING FOR SOULS", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
+        this.screen.putString(40, 29, "WAITING FOR SOULS", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
         screen.setCursorPosition(null);
 
         refresh();
