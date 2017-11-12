@@ -15,31 +15,28 @@ import java.util.TimerTask;
 
 public class Game {
 
+    private final int NUMBER_OF_PLAYERS = 4;
+    private final int START_ROW = 24;
+
     private Screen screen;
     private Grid grid;
     private View view;
     private Player player;
     private Socket connection;
-    private boolean isDead = false;
-    private Loader loader;
-    private final int START_ROW = 24;
     private String soulNumber;
-    private boolean hasWon = false;
-    private String playerID;
-    private int numberOfPlayers = 4;
     private ColourMap colourMap;
     private Lava lava;
     private Timer timer;
+    private boolean isDead = false;
+    private boolean hasWon = false;
 
 
     public Game() {
 
-
         this.grid = new Grid();
         this.view = new View();
         this.screen = view.getScreen();
-        this.player = new Player(this.view, this);
-        loader = new Loader();
+        this.player = new Player(this.view, this, this.grid);
         this.colourMap = new ColourMap();
         colourMap.init();
         lava = new Lava(this.grid, this.view);
@@ -67,13 +64,15 @@ public class Game {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        spawnPlayer(START_ROW);
+        player.spawnPlayer(START_ROW);
         riseLava();
-        player.keyHandler();
+        player.keyHandler(connection);
 
     }
 
+    /*
+    *
+    * */
     private void riseLava() {
 
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -86,7 +85,6 @@ public class Game {
             }
         }, 1000L, 1000L);
     }
-
 
     /*
     *
@@ -108,7 +106,7 @@ public class Game {
 
                         setDeadPlayer(read);
 
-                        updateGrid(read);
+                        updateStairs(read);
 
                         showPlayer(read);
 
@@ -129,7 +127,7 @@ public class Game {
     * */
     private void loadGameScreen() {
 
-        loadScreen(loader.readFile("Nivel1"));
+        loadScreen(new Loader().readFile("Nivel1"));
         playerList();
         refresh();
     }
@@ -147,7 +145,7 @@ public class Game {
             String startMessage;
 
             while (!(startMessage = bufferedReader.readLine()).equals("Start")) {
-                playerID = startMessage;
+                String playerID = startMessage;
                 playerID(startMessage);
 
             }
@@ -161,7 +159,7 @@ public class Game {
     * */
     private void inicialScreen() {
 
-        loadScreen(loader.readFile("Menu"));
+        loadScreen(new Loader().readFile("Menu"));
         this.screen.putString(45, 29, "WAITING FOR SOULS", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
         screen.setCursorPosition(null);
         refresh();
@@ -201,11 +199,10 @@ public class Game {
         }
     }
 
-
     /*
     *
     * */
-    private void updateGrid(String s) {
+    private void updateStairs(String s) {
 
         String[] coordinates = s.split(":");
 
@@ -218,146 +215,6 @@ public class Game {
             this.grid.updateCell(1, row, col);
         }
     }
-
-    /*
-    *
-    * */
-
-
-    /*
-    *
-    * */
-    private void spawnPlayer(int row) {
-
-        screen.setCursorPosition(((int) (Math.random() * 77)) + 11, row);
-
-    }
-
-
-    /*
-    *
-    * */
-    public void draw(int direction) {
-
-        if (isDead || hasWon) {
-            return;
-        }
-
-        if (view.playerPos_X() == view.terminalSize_X() - 1 || view.playerPos_X() == 0) {
-            return;
-        }
-
-        grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] = 1;
-        refresh();
-
-        try {
-
-            PrintStream out = new PrintStream(connection.getOutputStream());
-            out.println("CELL:" + view.playerPos_Y() + "/" + (view.playerPos_X() + direction));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /*
-    *
-    * */
-    public void checkMove(int direction) {
-
-
-        if (isDead) {
-            return;
-        }
-
-        if (hasWon) {
-            return;
-        }
-
-        if ((direction == 1 && (view.playerPos_X() == view.terminalSize_X() - 1)) || (direction == -1 && (view.playerPos_X() == 0))) {
-
-            return;
-        }
-
-        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] == 1 && grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X()] == 1) {
-            return;
-        }
-
-        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] != 1) {
-            move(direction, 0);
-            return;
-        }
-
-        if (grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] == 1 && grid.getGrid()[view.playerPos_Y() - 1][view.playerPos_X() + direction] != 1) {
-            move(direction, 1);
-            return;
-        }
-
-    }
-
-
-    /*
-    *
-    * */
-    private void move(int direction, int row) {
-
-        if (isDead || hasWon) {
-            return;
-        }
-
-
-        int oldX = view.playerPos_X();
-        int oldY = view.playerPos_Y();
-
-        view.setPlayerPos(view.playerPos_Y() - row, view.playerPos_X() + direction);
-
-        try {
-            PrintStream out = new PrintStream(connection.getOutputStream());
-            out.println("POS:" + oldY + "/" + oldX + "/" + view.playerPos_Y() + "/" + view.playerPos_X());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        checkWin();
-        checkFall();
-        refresh();
-    }
-
-
-    /*
-    * cheack if the player position is on the botton row
-    * while cell below player is empty incrise pY position of the player
-    * */
-
-    private void checkFall() {
-
-        if (this.view.playerPos_Y() == view.terminalSize_Y() - 1) {
-            return;
-        }
-        if (grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()] == 0) {
-
-
-            while (grid.getGrid()[this.view.playerPos_Y() + 1][this.view.playerPos_X()] == 0) {
-
-                int oldY = this.view.playerPos_Y();
-                int oldX = this.view.playerPos_X();
-
-                this.view.setPlayerPos(this.view.playerPos_Y() + 1, this.view.playerPos_X());
-                try {
-                    PrintStream out = new PrintStream(connection.getOutputStream());
-                    out.println("POS:" + oldY + "/" + oldX + "/" + view.playerPos_Y() + "/" + view.playerPos_X());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if (this.view.playerPos_Y() == view.terminalSize_Y() - 1) {
-                    break;
-                }
-            }
-
-        }
-
-    }
-
 
     /*
     *
@@ -375,12 +232,6 @@ public class Game {
         screen.refresh();
     }
 
-
-    /*
-    *
-    * */
-
-
     /*
     *
     * */
@@ -397,7 +248,6 @@ public class Game {
             e.printStackTrace();
         }
     }
-
 
     /*
     *
@@ -419,6 +269,9 @@ public class Game {
         }
     }
 
+    /*
+    *
+    * */
     public void weHaveAWinner(String message) {
 
         hasWon = true;
@@ -434,7 +287,6 @@ public class Game {
 
         if (deadPlayer.split(":")[0].equals("RIP")) {
 
-            System.out.println(deadPlayer);
             int number = Integer.parseInt(deadPlayer.split(" ")[1]) - 1;
             this.screen.putString(1, 2 + number * 3, "SOUL LOST", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
 
@@ -443,13 +295,18 @@ public class Game {
 
     }
 
+    /*
+    *
+    * */
     public void checkForWinner(String winningPlayer) {
 
         if (winningPlayer.split(":")[0].equals("WIN")) {
 
             isDead = true;
+            lava.stopLava();
 
-            loadScreen(loader.readFile(winningPlayer.split(":")[1].split(" ")[1]));
+
+            loadScreen(new Loader().readFile(winningPlayer.split(":")[1].split(" ")[1]));
 
         }
 
@@ -458,10 +315,9 @@ public class Game {
     /*
     *
     * */
-
     public void playerList() {
 
-        for (int i = 0; i < numberOfPlayers; i++) {
+        for (int i = 0; i < NUMBER_OF_PLAYERS; i++) {
 
             this.screen.putString(1, 1 + i * 3, "SOUL " + (i + 1), Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
 
@@ -469,6 +325,9 @@ public class Game {
 
     }
 
+    /*
+    *
+    * */
     public void checkWin() {
 
         if (this.view.playerPos_Y() == 0) {
@@ -479,7 +338,7 @@ public class Game {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            weHaveAWinner(loader.readFile(soulNumber.split(" ")[1]));
+            weHaveAWinner(new Loader().readFile(soulNumber.split(" ")[1]));
 
         }
     }

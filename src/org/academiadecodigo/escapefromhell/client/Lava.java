@@ -12,6 +12,7 @@ public class Lava {
     private int deathRow = 30;
     private Grid grid;
     private View view;
+    private boolean stop = false;
 
 
     public Lava(Grid grid, View view) {
@@ -25,6 +26,9 @@ public class Lava {
      */
     public void riseLava() {
 
+        if (stop) {
+            return;
+        }
         deathRow--;
         for (int i = 12; i < (view.terminalSize_X() - 11); i++) {
 
@@ -38,10 +42,13 @@ public class Lava {
     }
 
     /**
-     *
      * @return
      */
-    public int getDeathRow(){
+    public int getDeathRow() {
         return deathRow;
+    }
+
+    public void stopLava() {
+        stop = true;
     }
 }
