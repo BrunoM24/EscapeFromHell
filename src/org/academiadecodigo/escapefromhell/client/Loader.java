@@ -7,7 +7,7 @@ import java.io.IOException;
 public class Loader {
 
 
-    static String result = "";
+    private String result = "";
     private String aux = "";
 
     public String readFile(String file){
@@ -29,7 +29,7 @@ public class Loader {
             }
         }
         catch (IOException ex){
-            System.out.println("error");
+            System.out.println("error reading the file");
         }
         finally {
             try {

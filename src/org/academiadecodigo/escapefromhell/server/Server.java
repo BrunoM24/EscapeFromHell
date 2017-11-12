@@ -23,18 +23,11 @@ public class Server {
     private CopyOnWriteArrayList<PlayerHandler> playerConected;
     private int port;
 
-    // Esta prop. nunca é usada. retirar?
-    private Loader loadLevel = new Loader();
-
-
-    //private String level;
-
 
     public Server(int port) {
 
         this.port = port;
         playerConected = new CopyOnWriteArrayList<>();
-        //level = loadScreen.readFile(); aqui está
     }
 
 
@@ -53,7 +46,7 @@ public class Server {
         try {
             server = new ServerSocket(this.port);
 
-            while (playerConected.size() < 1) {
+            while (playerConected.size() < 2) {
 
                 Socket connection = server.accept();
                 PlayerHandler playerHandler = new PlayerHandler(connection, this, playerConected.size() + 1);
@@ -66,23 +59,9 @@ public class Server {
                 e.printStackTrace();
             }
             for (PlayerHandler player : playerConected) {
-                System.out.println("submiting player");
 
                 cachedPool.submit(player);
-
             }
-
-            System.out.println("all players submitted. game is starting");
-
-
-
-
-        while (true) {
-            Socket connection = server.accept();
-            PlayerHandler playerHandler = new PlayerHandler(connection, this, playerConected.size() +1);
-            playerConected.add(playerHandler);
-            cachedPool.submit(playerHandler);
-        }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -90,35 +69,28 @@ public class Server {
     }
 
     /*
-    * Broadcast message for all clients
-    * connected with the player
-    * */
+    * Send Star Game Message
+    * **/
     public void sendStartMessage(Socket connection) {
-
 
         try {
             new PrintStream(connection.getOutputStream()).println("Start");
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-
-
-
     }
 
     /*
-    *
+    *   Broadcast
     * */
-
-    public void sendMessage(String message) {
+    public void broadCast(String message) {
 
         synchronized (playerConected) {
+
             try {
                 for (int i = 0; i < playerConected.size(); i++) {
-                    PrintStream out = new PrintStream(playerConected.get(i).getConnection().getOutputStream());
-                    out.println(message);
 
-
+                    new PrintStream(playerConected.get(i).getConnection().getOutputStream()).println(message);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -128,23 +100,11 @@ public class Server {
 
 
     /*
-    *
-    * */
-    public int numberOfPlayers() {
-
-        return playerConected.size();
-    }
-
-    /*
     * Remove Player fom the List
     * when player close connection
-    * with the server
     * */
-
     public void playerRemove(PlayerHandler playerHandler) {
 
         playerConected.remove(playerHandler);
     }
-
-
 }

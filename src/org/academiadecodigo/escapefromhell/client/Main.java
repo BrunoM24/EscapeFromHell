@@ -9,6 +9,7 @@ public class Main {
     public static void main(String[] args) {
 
         Game game = new Game();
+
         if(args.length > 0){
             game.start(args[0], 6650);
         }else {

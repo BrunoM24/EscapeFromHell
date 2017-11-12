@@ -7,10 +7,9 @@ package org.academiadecodigo.escapefromhell.server;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("server");
+
         Server server = new Server(6650);
         server.openServer();
-
 
     }
 }

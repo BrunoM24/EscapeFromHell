@@ -13,10 +13,7 @@ public class PlayerHandler implements Runnable {
     private Server server;
     private Socket connection;
     private BufferedReader in;
-    private PrintStream out;
-    private boolean readyToPlay;
     private int ID;
-
 
     /*
     * Constructor recives an accepted client Socket from the server
@@ -28,14 +25,11 @@ public class PlayerHandler implements Runnable {
         this.connection = client;
         this.server = server;
         this.ID = ID;
-
-
     }
 
     /*
     *
     * */
-
     @Override
     public void run() {
 
@@ -52,22 +46,20 @@ public class PlayerHandler implements Runnable {
 
         try {
             in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
             boolean shutdownRequested = false;
-
             while (!shutdownRequested) {
-
 
                 String message;
                 if ((message = in.readLine()) != null) {
 
                     System.out.println(message);
-                    server.sendMessage(message);
+                    server.broadCast(message);
 
                 } else {
 
                     shutdownRequested = true;
                     shuDownConection();
-
                 }
             }
         } catch (IOException e) {
@@ -75,12 +67,10 @@ public class PlayerHandler implements Runnable {
         }
     }
 
-
     /*
     * Close socket connection when PLayer out
     * Remove player from the Arraylis
     * */
-
     private void shuDownConection() throws IOException {
 
         connection.close();
@@ -90,13 +80,8 @@ public class PlayerHandler implements Runnable {
     /*
     * Return the Socket connection
     * */
-
     public Socket getConnection() {
         return connection;
-    }
-
-    public void startGame() {
-        readyToPlay = true;
     }
 
 }
