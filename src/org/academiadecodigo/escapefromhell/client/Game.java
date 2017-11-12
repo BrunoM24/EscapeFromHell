@@ -6,8 +6,6 @@ import com.googlecode.lanterna.terminal.Terminal;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -31,6 +29,7 @@ public class Game {
     private boolean hasWon = false;
     private String playerID;
     private int numberOfPlayers = 4;
+    private ColourMap colourMap;
 
 
     public Game() {
@@ -41,6 +40,8 @@ public class Game {
         this.player = new Player(this.view, this);
         this.timer = new Timer();
         loader = new Loader();
+        this.colourMap = new ColourMap();
+        colourMap.init();
 
     }
 
@@ -77,6 +78,8 @@ public class Game {
 
 
             refresh();
+
+            //Isto já n foi alterado? continuamos com o == 5?
 
             new Thread(new Runnable() {
                 @Override
@@ -129,7 +132,6 @@ public class Game {
         soulNumber = serverMessage.split(":")[1];
         this.screen.putString(91, 2, "YOU ARE:", Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
         this.screen.putString(91, 4, soulNumber, Terminal.Color.CYAN, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
-
     }
 
 
@@ -344,17 +346,7 @@ public class Game {
         for (int row = 0; row < 29; row++) {
             for (int col = 10; col < 90; col++) {
 
-                if (grid.getGrid()[row][col] == 1) {
-                    this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.WHITE);
-                } else if (grid.getGrid()[row][col] == 2) {
-                    this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.GREEN);
-                } else if (grid.getGrid()[row][col] == 3) {
-                    this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.RED);
-                } else if (grid.getGrid()[row][col] == 4) {
-                    this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.YELLOW);
-                } else {
-                    this.screen.putString(col, row, " ", Terminal.Color.CYAN, Terminal.Color.BLACK);
-                }
+                this.screen.putString(col,row, " ", Terminal.Color.CYAN,colourMap.getColour(grid.getGrid()[row][col]));
 
             }
         }
