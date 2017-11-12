@@ -3,6 +3,8 @@ package org.academiadecodigo.escapefromhell.client;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.ScreenCharacterStyle;
 import com.googlecode.lanterna.terminal.Terminal;
+import org.academiadecodigo.escapefromhell.sound.SoundManager;
+import org.academiadecodigo.escapefromhell.sound.SoundType;
 
 import java.io.*;
 import java.net.Socket;
@@ -19,6 +21,7 @@ public class Game {
     private final int START_ROW = 24;
 
     private Screen screen;
+    private SoundManager soundManager = new SoundManager();
     private Grid grid;
     private View view;
     private Player player;
@@ -47,8 +50,9 @@ public class Game {
     *
     * */
     public void start(String ip, int port) {
-
+        //soundManager.loop(SoundType.START);
         inicialScreen();
+
 
         try {
 
@@ -98,7 +102,7 @@ public class Game {
                 try {
 
                     BufferedReader pos = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    while (pos != null) {
+                    while (true) {
 
                         String read = pos.readLine();
 
@@ -158,7 +162,7 @@ public class Game {
     *
     * */
     private void inicialScreen() {
-
+        soundManager.loop(SoundType.START);
         loadScreen(new Loader().readFile("Menu"));
         this.screen.putString(45, 29, "WAITING FOR SOULS", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
         screen.setCursorPosition(null);
@@ -290,7 +294,7 @@ public class Game {
             int number = Integer.parseInt(deadPlayer.split(" ")[1]) - 1;
             this.screen.putString(1, 2 + number * 3, "SOUL LOST", Terminal.Color.RED, Terminal.Color.BLACK, ScreenCharacterStyle.Bold);
 
-            refresh();
+
         }
 
     }

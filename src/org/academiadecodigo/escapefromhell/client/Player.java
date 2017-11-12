@@ -80,7 +80,7 @@ public class Player {
         }
 
         grid.getGrid()[view.playerPos_Y()][view.playerPos_X() + direction] = 1;
-        game.refresh();
+
 
         try {
 
@@ -148,8 +148,9 @@ public class Player {
             e.printStackTrace();
         }
         game.checkWin();
+        game.checkDead();
         checkFall(connection);
-        game.refresh();
+
     }
 
         /*
