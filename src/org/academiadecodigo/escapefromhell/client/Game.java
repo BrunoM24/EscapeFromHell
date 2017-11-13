@@ -119,8 +119,6 @@ public class Game {
 
     }
 
-
-
     /*
     *
     * */
@@ -179,7 +177,7 @@ public class Game {
     public void init() {
 
 
-        spawnPlayer(4);
+        spawnPlayer(START_ROW);
 
         refresh();
 

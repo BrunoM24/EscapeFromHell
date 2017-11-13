@@ -19,7 +19,7 @@ public class Loader {
 
         try {
 
-            reader = new FileReader(file+".txt");
+            reader = new FileReader("/"+file+".txt");
             BufferedReader br = new BufferedReader(reader);
 
             while ((aux = br.readLine()) != null) {
